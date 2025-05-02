@@ -33,7 +33,7 @@ namespace SilkRoute.Extensions
             services.AddScoped<TClient>(provider =>
             {
                 var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(clientName);
-                return ProxyFactory<TClient>.Create(httpClient);
+                return MicroserviceProxyFactory<TClient>.Create(httpClient);
             });
 
             return services;
