@@ -12,6 +12,7 @@
 		<Description>
 			Provides a declarative, interface-driven approach to generating and registering microservice clients, streamlining API calls, centralizing configuration, and eliminating boilerplate setup.
 		</Description>
+		<PackageIcon>NugetResources/package_icon.png</PackageIcon>
 		<PackageTags>microservice;http;api</PackageTags>
 		<RepositoryUrl>https://github.com/EnskWt/SilkRoute</RepositoryUrl>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -21,6 +22,10 @@
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="NugetResources\package_icon.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 
 </Project>
