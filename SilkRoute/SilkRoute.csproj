@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+
+        <PackageId>SilkRoute</PackageId>
+        <Version>3.0.0</Version>
+        <Title>SilkRoute</Title>
+        <Authors>Ihor Nykolaichuk</Authors>
+        <Description>Allows a microservice API to be described declaratively as an interface-based contract. Once such a contract is configured for use, SilkRoute can provide a dynamically generated proxy that implements the interface and can be consumed like a regular application service. Although the calling code interacts with an ordinary interface, each method invocation is translated into an HTTP request to the target service, and the received response is mapped back to the return type declared by the contract.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>package_icon.png</PackageIcon>
+        <PackageTags>microservice;http;api</PackageTags>
+        <RepositoryUrl>https://github.com/EnskWt/SilkRoute</RepositoryUrl>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <OutputType>Library</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Castle.Core" Version="5.2.1"/>
+        <PackageReference Include="Castle.Core.AsyncInterceptor" Version="2.1.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="NugetResources\package_icon.png" Pack="true" PackagePath=""/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="NugetResources\README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+
+</Project>

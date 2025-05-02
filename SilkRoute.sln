@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilkRoute", "SilkRoute\SilkRoute.csproj", "{0FD257E3-BEDF-4116-B9E6-535B90D15178}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilkRoute.Demo.Shared", "SilkRoute.Demo.Shared\SilkRoute.Demo.Shared.csproj", "{57BEF781-63BF-475B-AF2E-192D65F69A7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilkRoute.Demo.TestMicroservice", "SilkRoute.Demo.TestMicroservice\SilkRoute.Demo.TestMicroservice.csproj", "{4A53E950-BC3A-42EE-964A-4E1B26711620}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilkRoute.Demo.ClientMicroservice", "SilkRoute.Demo.ClientMicroservice\SilkRoute.Demo.ClientMicroservice.csproj", "{93062D37-A662-477D-BF62-0F112507434C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0FD257E3-BEDF-4116-B9E6-535B90D15178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FD257E3-BEDF-4116-B9E6-535B90D15178}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FD257E3-BEDF-4116-B9E6-535B90D15178}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FD257E3-BEDF-4116-B9E6-535B90D15178}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57BEF781-63BF-475B-AF2E-192D65F69A7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57BEF781-63BF-475B-AF2E-192D65F69A7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57BEF781-63BF-475B-AF2E-192D65F69A7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57BEF781-63BF-475B-AF2E-192D65F69A7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A53E950-BC3A-42EE-964A-4E1B26711620}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A53E950-BC3A-42EE-964A-4E1B26711620}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A53E950-BC3A-42EE-964A-4E1B26711620}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A53E950-BC3A-42EE-964A-4E1B26711620}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93062D37-A662-477D-BF62-0F112507434C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93062D37-A662-477D-BF62-0F112507434C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93062D37-A662-477D-BF62-0F112507434C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93062D37-A662-477D-BF62-0F112507434C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {332A2713-4C58-4AA5-AE59-219C64C14EA9}
+	EndGlobalSection
+EndGlobal
