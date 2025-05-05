@@ -25,7 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="NugetResources\package_icon.png" Pack="true" PackagePath=""/>
+		<None Include="NugetResources\package_icon.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 
 </Project>
