@@ -11,7 +11,7 @@ namespace SilkRoute.Proxy
     /// <summary>
     /// Factory to create proxy instances.
     /// </summary>
-    public static class MicroserviceProxyFactory<T> where T : IMicroserviceClient
+    internal static class MicroserviceProxyFactory<T> where T : IMicroserviceClient
     {
         public static T Create(HttpClient httpClient)
         {

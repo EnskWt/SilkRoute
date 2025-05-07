@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -18,8 +19,9 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
-using SilkRoute.Helpers;
+using Newtonsoft.Json.Linq;
 using SilkRoute.Interfaces;
+using SilkRoute.Tools.RequestTools;
 
 namespace SilkRoute.Proxy
 {
@@ -27,7 +29,7 @@ namespace SilkRoute.Proxy
     /// DispatchProxy implementation that handles method calls on the generated proxy.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class MicroserviceProxy<T> : DispatchProxy where T : IMicroserviceClient
+    internal class MicroserviceProxy<T> : DispatchProxy where T : IMicroserviceClient
     {
         // HttpClient to be used for making requests
         private HttpClient? _httpClient;
@@ -97,276 +99,19 @@ namespace SilkRoute.Proxy
             var method = httpAttr?.HttpMethods.First() ?? HttpMethods.Get;
             var template = httpAttr?.Template ?? routeAttr?.Template
                            ?? throw new InvalidOperationException("Route template is not specified.");
+
             var uri = template;
-            HttpContent? content = null;
 
             var parameters = targetMethod.GetParameters();
-            var routeParams = new Dictionary<string, string>();
-            var headerParams = new Dictionary<string, string>();
-            (string Name, object Value)? explicitBody = null;
-            var defaultParams = new List<(string Name, object Value)>();
 
-            var placeholders = RequestHelper.GetPlaceholders(template);
-            var queryBuilder = new QueryBuilder();
+            var requestBuilder = new RequestBuilder(new HttpMethod(method), uri);
 
-            MultipartFormDataContent? formContent = null;
+            requestBuilder.BindAllParameters(parameters, args);
 
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                var p = parameters[i];
-                var val = args != null && i < args.Length ? args[i] : null;
-                if (val == null) continue;
+            requestBuilder.EnsureNoBodyAndFormDataConflict();
 
-                var name = p.Name!;
-                var hasFromRoute = p.GetCustomAttribute<FromRouteAttribute>() != null;
-                var mappedType = RequestHelper.MapTypeName(p.ParameterType);
-                var isPlaceholder = placeholders.Any(pi =>
-                    pi.Name == name && (pi.Type == null || (mappedType != null && pi.Type == mappedType)));
-
-
-                if (hasFromRoute || isPlaceholder)
-                {
-                    routeParams[name] = val.ToString()!;
-                    continue;
-                }
-
-                if (p.GetCustomAttribute<FromFormAttribute>() != null)
-                {
-                    formContent ??= new MultipartFormDataContent();
-                    if (val is IFormFile formFile)
-                    {
-                        var stream = formFile.OpenReadStream();
-                        var streamContent = new StreamContent(stream);
-                        streamContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                        {
-                            Name = $"\"{name}\"",
-                            FileName = $"\"{formFile.FileName}\""
-                        };
-                        streamContent.Headers.ContentType = MediaTypeHeaderValue.Parse(formFile.ContentType);
-                        formContent.Add(streamContent, name, formFile.FileName);
-                    }
-                    else if (val is IEnumerable<IFormFile> formFiles)
-                    {
-                        foreach (var file in formFiles)
-                        {
-                            var stream = file.OpenReadStream();
-                            var streamContent = new StreamContent(stream);
-                            streamContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                            {
-                                Name = $"\"{name}\"",
-                                FileName = $"\"{file.FileName}\""
-                            };
-                            streamContent.Headers.ContentType = MediaTypeHeaderValue.Parse(file.ContentType);
-                            formContent.Add(streamContent, name, file.FileName);
-                        }
-                    }
-                    else if (RequestHelper.IsPrimitive(val.GetType()) || val is string)
-                    {
-                        formContent.Add(new StringContent(val.ToString()!), name);
-                    }
-                    else if (val is Stream s)
-                    {
-                        var sc = new StreamContent(s);
-                        sc.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                        {
-                            Name = $"\"{name}\"",
-                            FileName = "\"file\""
-                        };
-                        formContent.Add(sc, name, "file");
-                    }
-                    else if (val is byte[] bytes)
-                    {
-                        var bc = new ByteArrayContent(bytes);
-                        bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                        {
-                            Name = $"\"{name}\"",
-                            FileName = "\"file\""
-                        };
-                        formContent.Add(bc, name, "file");
-                    }
-                    else if (val is HttpContent hc)
-                    {
-                        formContent.Add(hc, name);
-                    }
-                    else
-                    {
-                        foreach (var prop in val.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                        {
-                            var propVal = prop.GetValue(val);
-                            if (propVal == null) continue;
-                            var propName = prop.Name;
-                            if (RequestHelper.IsPrimitive(prop.PropertyType) || propVal is string)
-                            {
-                                formContent.Add(new StringContent(propVal.ToString()!), propName);
-                            }
-                            else if (propVal is IEnumerable<object> coll)
-                            {
-                                foreach (var item in coll)
-                                    formContent.Add(new StringContent(item?.ToString() ?? ""), propName);
-                            }
-                            else if (propVal is IFormFile nestedFile)
-                            {
-                                var nestedStream = nestedFile.OpenReadStream();
-                                var nestedSc = new StreamContent(nestedStream);
-                                nestedSc.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                                {
-                                    Name = $"\"{propName}\"",
-                                    FileName = $"\"{nestedFile.FileName}\""
-                                };
-                                nestedSc.Headers.ContentType = MediaTypeHeaderValue.Parse(nestedFile.ContentType);
-                                formContent.Add(nestedSc, propName, nestedFile.FileName);
-                            }
-                            else if (propVal is Stream nestedStream)
-                            {
-                                var nestedSc = new StreamContent(nestedStream);
-                                nestedSc.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                                {
-                                    Name = $"\"{propName}\"",
-                                    FileName = "\"file\""
-                                };
-                                formContent.Add(nestedSc, propName, "file");
-                            }
-                            else if (propVal is byte[] nestedBytes)
-                            {
-                                var nestedBc = new ByteArrayContent(nestedBytes);
-                                nestedBc.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                                {
-                                    Name = $"\"{propName}\"",
-                                    FileName = "\"file\""
-                                };
-                                formContent.Add(nestedBc, propName, "file");
-                            }
-                            else if (propVal is HttpContent nestedHc)
-                            {
-                                formContent.Add(nestedHc, propName);
-                            }
-                            else
-                            {
-                                formContent.Add(new StringContent(JsonConvert.SerializeObject(propVal)), propName);
-                            }
-                        }
-                    }
-                    continue;
-                }
-
-                if (p.GetCustomAttribute<FromQueryAttribute>() != null)
-                {
-                    if (val is System.Collections.IEnumerable coll && val is not string)
-                    {
-                        foreach (var item in coll)
-                            queryBuilder.Add(name, item?.ToString() ?? "");
-                    }
-                    else if (RequestHelper.IsPrimitive(val.GetType()))
-                    {
-                        queryBuilder.Add(name, val.ToString()!);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"Cannot bind complex object '{name}' of type '{val.GetType().Name}' to query string. Use [FromBody] or flatten your DTO into primitives.");
-                    }
-                    continue;
-                }
-
-                if (p.GetCustomAttribute<FromHeaderAttribute>() != null)
-                {
-                    headerParams[name] = val.ToString()!;
-                    continue;
-                }
-
-                if (p.GetCustomAttribute<FromBodyAttribute>() != null)
-                {
-                    explicitBody = (name, val);
-                    continue;
-                }
-
-                if (HttpMethods.IsGet(method))
-                {
-                    if (val is IEnumerable<object> coll && val is not string)
-                    {
-                        foreach (var item in coll)
-                            queryBuilder.Add(name, item?.ToString() ?? "");
-                    }
-                    else
-                    {
-                        queryBuilder.Add(name, val.ToString()!);
-                    }
-                    continue;
-                }
-
-                defaultParams.Add((name, val));
-            }
-
-            foreach (var kv in routeParams)
-                uri = uri.Replace("{" + kv.Key + "}", Uri.EscapeDataString(kv.Value));
-
-            if (!HttpMethods.IsGet(method) && formContent != null)
-            {
-                content = formContent;
-            }
-            else if (!HttpMethods.IsGet(method))
-            {
-                if (explicitBody.HasValue)
-                {
-                    var value = explicitBody.Value.Value;
-                    switch (value)
-                    {
-                        case HttpContent hc: content = hc; break;
-                        case Stream s:
-                            content = new StreamContent(s);
-                            content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                            break;
-                        case byte[] bytes: content = new ByteArrayContent(bytes); break;
-                        case string str: content = new StringContent(str, Encoding.UTF8, "text/plain"); break;
-                        default: content = new StringContent(JsonConvert.SerializeObject(value), Encoding.UTF8, "application/json"); break;
-                    }
-                    if (content.Headers.ContentType == null)
-                        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                }
-                else
-                {
-                    var primitives = defaultParams.Where(x => RequestHelper.IsPrimitive(x.Value.GetType()));
-                    foreach (var p in primitives)
-                    {
-                        if (p.Value is System.Collections.IEnumerable coll && p.Value is not string)
-                        {
-                            foreach (var item in coll)
-                                queryBuilder.Add(p.Name, item?.ToString() ?? "");
-                        }
-                        else
-                        {
-                            queryBuilder.Add(p.Name, p.Value.ToString()!);
-                        }
-                    }
-                    var complex = defaultParams.Where(x => !RequestHelper.IsPrimitive(x.Value.GetType())).ToList();
-                    if (complex.Count > 1)
-                        throw new InvalidOperationException("Cannot serialize multiple complex parameters to body; please use a single DTO or [FromBody] explicitly.");
-                    else if (complex.Count == 1)
-                    {
-                        var value = complex[0].Value;
-                        switch (value)
-                        {
-                            case HttpContent hc: content = hc; break;
-                            case Stream s:
-                                content = new StreamContent(s);
-                                content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                                break;
-                            case byte[] bytes: content = new ByteArrayContent(bytes); break;
-                            case string str: content = new StringContent(str, Encoding.UTF8, "text/plain"); break;
-                            default: content = new StringContent(JsonConvert.SerializeObject(value), Encoding.UTF8, "application/json"); break;
-                        }
-                        if (content.Headers.ContentType == null)
-                            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                    }
-                }
-            }
-
-            if (queryBuilder.Count() > 0)
-                uri += queryBuilder.ToQueryString();
-
-            return (method, uri, content, headerParams);
+            return requestBuilder.BuildRequest();
         }
-
-
 
         /// <summary>
         /// Sends the HTTP request and reads the response.

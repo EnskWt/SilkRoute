@@ -1,0 +1,99 @@
+[FromRoute] int id -> route parameter {id}
+int id -> route parameter {id} if placeholder exists, otherwise query id=…
+[FromQuery] string filter -> query ?filter=…
+string filter -> query ?filter=…
+[FromHeader] string authToken -> header “authToken: …”
+string authToken -> query ?authToken=…
+[FromBody] MyDto dto -> JSON body serialized dto
+MyDto dto -> JSON body serialized dto
+[FromForm] IFormFile file -> multipart/form-data with “file”
+IFormFile file -> multipart/form-data with “file”
+[FromForm] IFormFile[] files -> multipart/form-data with multiple file fields
+List<IFormFile> files -> multipart/form-data with multiple file fields
+[FromBody] IFormFile file -> error (cannot use [FromBody] with file)
+MyFormDto { IFormFile file; string name; } model -> multipart/form-data: file+“name”
+Dictionary<string,string> dict -> query dict.key=value&dict.key2=value2
+[FromQuery] Dictionary<int,string> dict -> query dict[1]=value
+Dictionary<int,MyDto> dict -> query dict[1].Prop=…
+[FromQuery] List<int> ids -> query ids=1&ids=2&ids=3
+int[] ids -> query ids=1&ids=2&ids=3
+IEnumerable<string> tags -> query tags=a&tags=b
+[FromQuery] string[] tags -> query tags=a&tags=b
+List<MyDto> items -> JSON body first item, query items[1].Prop=…&items[2].Prop=…
+MyDto[] items -> JSON body first item, query items[1].Prop… 
+[FromBody] List<MyDto> items -> JSON body serialized list
+[FromForm] List<MyDto> items -> multipart/form-data flatten items.* fields
+CancellationToken ct -> query ct.CancellationRequested=false&ct.IsCancellationRequested=false
+X {int A; List<string> B;} x -> query x.A=123&x.B=a&x.B=b
+[FromBody] Dictionary<string,List<int>> d -> JSON body serialized d
+[FromBody] byte[] data -> ByteArrayContent body
+byte[] data -> ByteArrayContent body
+[FromBody] Stream s -> StreamContent octet-stream body
+Stream s -> error (stream must be bound [FromBody])
+object o -> JSON body serialized o
+(string a,int b) tuple -> JSON body serialized tuple
+Tuple<int,string> t -> JSON body serialized tuple
+[FromQuery] object o -> query o.Prop=…
+[FromRoute] Guid id -> route parameter {id}
+Guid id -> route parameter {id}
+[FromQuery] Guid id -> query id=…
+Guid? optional -> query optional=…
+[FromBody] int? x -> JSON body value|null
+int? x -> JSON body value|null
+[FromForm] Dictionary<string,string> d -> multipart/form-data d.key=value
+Dictionary<string,string> d -> query d.key=value
+[FromForm] Stream s -> error ([FromForm] cannot bind Stream)
+[FromRoute] string name -> route parameter {name}
+[FromQuery] DateTime dt -> query dt=2025-05-07T12:34:56
+DateTime dt -> query dt=2025-05-07T12:34:56
+[FromBody] DateTime dt -> JSON body serialized dt
+DateTime? dt -> query dt=…
+[FromQuery] decimal price -> query price=19.99
+decimal price -> query price=19.99
+[FromBody] decimal price -> JSON body price
+[FromForm] decimal price -> form-data price=19.99
+decimal[] arr -> query arr=1&arr=2
+[FromQuery] List<bool> flags -> query flags=true&flags=false
+bool flag -> query flag=true
+[FromBody] bool flag -> JSON body true
+IFormFile? file -> ignored if null
+MyDto? dto -> ignored if null
+List<string>? tags -> ignored if null
+[FromQuery] double value -> query value=3.14
+double value -> query value=3.14
+[FromBody] char c -> JSON body "c"
+char c -> query c=c
+[FromForm] char c -> form-data c=c
+[FromHeader] DateTimeOffset dtoOff -> header dtoOff:2025-05-07T12:34:56+02:00
+Dictionary<string,IFormFile> uploadMap -> multipart/form-data each file
+[FromForm] Dictionary<string,IFormFile> uploadMap -> multipart/form-data each file
+Dictionary<string,Stream> streamMap -> error (Stream in dict)
+[FromForm] Dictionary<string,Stream> streamMap -> multipart/form-data each stream
+[FromBody] List<Dictionary<string,int>> listDict -> JSON body serialized list
+Dictionary<string,List<IFormFile>> complexMap -> multipart/form-data nested file lists
+[FromForm] Dictionary<string,List<IFormFile>> complexMap -> multipart/form-data nested lists
+IEnumerable<IEnumerable<int>> matrix -> query matrix=1&matrix=2…
+[FromQuery] IEnumerable<IEnumerable<int>> matrix -> query nested flatten
+object[] arrObj -> JSON body first element, query arrObj[1].*
+[FromQuery] object[] arrObj -> query flatten all values
+List<object> objList -> JSON body first, query rest
+MyNestedDto { Sub:MyDto; List<int> N; } nested -> JSON body nested
+[FromBody] MyNestedDto nested -> JSON body nested
+[FromForm] IFormFile file1, IFormFile file2 -> multipart with both files
+IFormFile file1, IFormFile file2 -> multipart with both files
+[FromForm] string name, IFormFile file -> form-data name + file
+string name, IFormFile file -> form-data file, query name=name
+[FromForm] string name, MyDto dto -> form-data name, query dto.*
+[FromBody] byte[] data, [FromQuery] int x -> body ByteArrayContent, query x=…
+[FromBody] Stream s, [FromHeader] string token -> body StreamContent, header token
+[FromRoute] int id, MyDto dto -> route id, JSON body dto
+[FromRoute] int id, MyDto[] dtos -> route id, JSON body first dto, query dtos[1].*
+[FromRoute] int id, [FromBody] MyDto dto -> route id, JSON body dto
+int id, MyDto dto -> route id, JSON body dto
+[FromQuery] Dictionary<string,Dictionary<string,int>> nestedDict -> query flatten nested twice
+Dictionary<string,Dictionary<string,int>> nestedDict -> query flatten nested twice
+[FromBody] Dictionary<string,Dictionary<string,int>> nestedDict -> JSON body nested
+(MyDto dto1, MyDto dto2) tupleParams -> JSON body serialized tuple
+[FromQuery] MyDto dto -> query dto.Prop=...
+[FromBody] (string a,int b) tuple -> JSON body serialized tuple
+MyTupleDto { Tuple<string,int> T; } tupleDto -> JSON body serialized tupleDto
