@@ -7,7 +7,7 @@
 
 		<!-- NuGet package metadata -->
 		<PackageId>SilkRoute</PackageId>
-		<Version>1.0.1</Version>
+		<Version>1.1.0</Version>
 		<Authors>Ihor Nykolaichuk</Authors>
 		<Description>
 			Provides a declarative, interface-driven approach to generating and registering microservice clients, streamlining API calls, centralizing configuration, and eliminating boilerplate setup.
