@@ -19,21 +19,7 @@ namespace SilkRoute.Tools.RequestTools.RequestParametersBinders
             if (value == null)
                 return false;
 
-            var allowedTypes = new[]
-            {
-                typeof(FromFormAttribute),
-                typeof(FromBodyAttribute),
-                typeof(FromRouteAttribute),
-                typeof(FromQueryAttribute),
-                typeof(FromHeaderAttribute)
-            };
-
-            var firstRelevant = parameterInfo
-                .GetCustomAttributes()
-                .Cast<Attribute>()
-                .FirstOrDefault(attr => allowedTypes.Contains(attr.GetType()));
-
-            return firstRelevant is T;
+            return parameterInfo.GetCustomAttribute<T>() != null;
         }
 
         public abstract void Bind(RequestBuilder requestBuilder, ParameterInfo parameterInfo, object value);

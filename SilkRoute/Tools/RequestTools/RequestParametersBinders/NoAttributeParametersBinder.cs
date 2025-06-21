@@ -12,7 +12,7 @@ namespace SilkRoute.Tools.RequestTools.RequestParametersBinders
     internal class NoAttributeParametersBinder : IRequestParametersBinder
     {
         public int Priority { get; } = int.MaxValue;
-        public bool CanBind(ParameterInfo p, object? value) => value != null;
+        public bool CanBind(ParameterInfo parameterInfo, object? value) => value != null;
 
         public void Bind(RequestBuilder requestBuilder, ParameterInfo parameterInfo, object value)
         {

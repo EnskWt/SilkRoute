@@ -9,7 +9,7 @@ using SilkRoute.Tools.RequestTools;
 
 namespace SilkRoute.Tools.RequestTools.RequestParametersBinders
 {
-    internal class RouteParametersBinder : AttributeParametersBinder<RouteAttribute>
+    internal class RouteParametersBinder : AttributeParametersBinder<FromRouteAttribute>
     {
         public override int Priority { get; } = 3;
 
