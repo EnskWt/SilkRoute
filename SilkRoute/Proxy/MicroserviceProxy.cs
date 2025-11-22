@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Castle.DynamicProxy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -29,38 +30,80 @@ namespace SilkRoute.Proxy
     /// DispatchProxy implementation that handles method calls on the generated proxy.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class MicroserviceProxy<T> : DispatchProxy where T : IMicroserviceClient
+    internal class MicroserviceProxy<T> : IAsyncInterceptor
+        where T : IMicroserviceClient
     {
-        // HttpClient to be used for making requests
-        private HttpClient? _httpClient;
+        private readonly HttpClient _httpClient;
 
-        // Method to set to created HttpClient instance
-        internal void SetHttpClient(HttpClient httpClient)
+        public MicroserviceProxy(HttpClient httpClient)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        /// <summary>
-        /// Invokes the method on the proxy.
-        /// </summary>
-        /// <param name="targetMethod"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
+        public void InterceptSynchronous(IInvocation invocation)
         {
-            EnsureInitialized(targetMethod);
+            EnsureInitialized(invocation.Method);
 
-            var (method, uri, content, headers) = PrepareRequest(targetMethod!, args);
-            var (response, json) = SendAndReadResponse(method, uri, content, headers);
+            var method = invocation.Method;
+            var returnType = method.ReturnType;
 
-            var (responseType, isAsync) = GetReturnTypeInfo(targetMethod!);
+            var result = Invoke(method, invocation.Arguments)
+                .GetAwaiter()
+                .GetResult();
+
+            if (returnType != typeof(void))
+            {
+                invocation.ReturnValue = result;
+            }
+        }
+
+        public void InterceptAsynchronous(IInvocation invocation)
+        {
+            EnsureInitialized(invocation.Method);
+
+            invocation.ReturnValue = InterceptAsyncNonGeneric(invocation);
+        }
+
+        private async Task InterceptAsyncNonGeneric(IInvocation invocation)
+        {
+            var method = invocation.Method;
+            await Invoke(method, invocation.Arguments).ConfigureAwait(false);
+        }
+
+
+        public void InterceptAsynchronous<TResult>(IInvocation invocation)
+        {
+            EnsureInitialized(invocation.Method);
+
+            invocation.ReturnValue = InterceptAsyncGeneric<TResult>(invocation);
+        }
+
+        private async Task<TResult> InterceptAsyncGeneric<TResult>(IInvocation invocation)
+        {
+            var method = invocation.Method;
+
+            var result = await Invoke(method, invocation.Arguments)
+                .ConfigureAwait(false);
+
+            return (TResult)result!;
+        }
+
+        private async Task<object?> Invoke(MethodInfo targetMethod, object?[] args)
+        {
+            var (method, uri, content, headers) = PrepareRequest(targetMethod, args);
+
+            var (response, json) = await SendAndReadResponse(method, uri, content, headers)
+                .ConfigureAwait(false);
+
+            var (responseType, _) = GetReturnTypeInfo(targetMethod);
             var (isActionResult, payloadType) = GetPayloadInfo(responseType);
 
             object? payload = DeserializePayload(json, payloadType);
             object result = BuildResult(response, responseType, isActionResult, payload);
 
-            return WrapIfAsync(result, responseType, isAsync);
+            return result;
         }
+
 
         /// <summary>
         /// Ensures that the proxy is initialized with a valid HttpClient and method.
@@ -121,7 +164,7 @@ namespace SilkRoute.Proxy
         /// <param name="content"></param>
         /// <returns></returns>
         /// <exception cref="HttpRequestException"></exception>
-        private (HttpResponseMessage response, string json) SendAndReadResponse(string method, string uri, HttpContent? content, IDictionary<string, string> headers)
+        private async Task<(HttpResponseMessage response, string json)> SendAndReadResponse(string method, string uri, HttpContent? content, IDictionary<string, string> headers)
         {
             var request = new HttpRequestMessage(new HttpMethod(method), uri) { Content = content };
 
@@ -130,8 +173,8 @@ namespace SilkRoute.Proxy
                 request.Headers.TryAddWithoutValidation(header.Key, header.Value);
             }
 
-            var response = _httpClient!.SendAsync(request).Result;
-            var json = response.Content.ReadAsStringAsync().Result;
+            var response = await _httpClient!.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
                 throw new HttpRequestException(json);
 
@@ -270,30 +313,6 @@ namespace SilkRoute.Proxy
                 ContentType = "application/json",
                 StatusCode = statusCode
             };
-        }
-
-        /// <summary>
-        /// Wraps the result in a Task if the method is asynchronous.
-        /// </summary>
-        /// <param name="result"></param>
-        /// <param name="responseType"></param>
-        /// <param name="isAsync"></param>
-        /// <returns></returns>
-        private object? WrapIfAsync(object result, Type responseType, bool isAsync)
-        {
-            // If the method is not asynchronous, return the result directly
-            if (!isAsync)
-                return result;
-
-            // If the response type is void (in other words Task without generic type), return a completed Task
-            if (responseType == typeof(void))
-                return Task.CompletedTask;
-
-            // If the response type is a Task with a generic type, we need to wrap the result in a Task
-            var fromResult = typeof(Task)
-                .GetMethod(nameof(Task.FromResult))!
-                .MakeGenericMethod(responseType);
-            return (Task)fromResult.Invoke(null, new[] { result })!;
         }
     }
 }
