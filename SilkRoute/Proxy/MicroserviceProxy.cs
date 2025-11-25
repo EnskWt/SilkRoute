@@ -175,8 +175,6 @@ namespace SilkRoute.Proxy
 
             var response = await _httpClient!.SendAsync(request);
             var json = await response.Content.ReadAsStringAsync();
-            if (!response.IsSuccessStatusCode)
-                throw new HttpRequestException(json);
 
             return (response, json);
         }
