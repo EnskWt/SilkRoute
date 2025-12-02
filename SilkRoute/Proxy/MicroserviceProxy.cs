@@ -289,11 +289,9 @@ namespace SilkRoute.Proxy
             // If the response type is not direct ActionResult with generic type, we need to create an instance of the specific ActionResult type with payload as value (usually string)
             if (typeof(ObjectResult).IsAssignableFrom(responseType))
             {
-                var inst = Activator.CreateInstance(responseType)!;
-                var obj = (ObjectResult)inst;
-                obj.Value = payload;
+                var obj = (ObjectResult)Activator.CreateInstance(responseType, payload)!;
                 obj.StatusCode = statusCode;
-                return inst;
+                return obj;
             }
 
             // For all other cases, we need to create an instance of the ContentResult with payload as value (usually string) or StatusCodeResult:
