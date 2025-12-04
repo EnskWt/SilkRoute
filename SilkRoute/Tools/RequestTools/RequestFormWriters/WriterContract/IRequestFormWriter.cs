@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SilkRoute.Tools.RequestTools.RequestFormWriters.WriterContract
+﻿namespace SilkRoute.Tools.RequestTools.RequestFormWriters.WriterContract
 {
     internal interface IRequestFormWriter
     {

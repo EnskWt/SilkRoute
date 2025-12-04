@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Reflection;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SilkRoute.Tools.RequestTools.RequestContentBinder;
 using SilkRoute.Tools.RequestTools.RequestContentBinder.BinderContract;
 using SilkRoute.Tools.RequestTools.RequestHelpers;

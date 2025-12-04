@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using SilkRoute.Tools.RequestTools.RequestFormWriters.WriterContract;
 using SilkRoute.Tools.RequestTools.RequestHelpers;
 
 namespace SilkRoute.Tools.RequestTools.RequestFormWriters
 {
-    internal class ComplexContentWriter  : IRequestFormWriter
+    internal class ComplexContentWriter : IRequestFormWriter
     {
         public int Priority => 4;
 
