@@ -43,7 +43,7 @@ namespace SilkRoute.Tools.RequestTools.RequestHelpers
                     "You must pass streams either as top-level [FromBody] (Stream) or [FromForm] (IFormFile), " +
                     "but not embed them in a complex DTO.");
 
-            var factory = _bodyFactories.First(x => x.CanHandle(val));
+            var factory = _bodyFactories.First(x => x.CanCreate(val));
             return factory.Create(val);
         }
 

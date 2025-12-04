@@ -27,7 +27,7 @@ using SilkRoute.Tools.RequestTools;
 namespace SilkRoute.Proxy
 {
     /// <summary>
-    /// DispatchProxy implementation that handles method calls on the generated proxy.
+    /// IAsyncInterceptor implementation that handles method calls on the generated proxy.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     internal class MicroserviceProxy<T> : IAsyncInterceptor
@@ -42,8 +42,6 @@ namespace SilkRoute.Proxy
 
         public void InterceptSynchronous(IInvocation invocation)
         {
-            EnsureInitialized(invocation.Method);
-
             var method = invocation.Method;
             var returnType = method.ReturnType;
 
@@ -59,8 +57,6 @@ namespace SilkRoute.Proxy
 
         public void InterceptAsynchronous(IInvocation invocation)
         {
-            EnsureInitialized(invocation.Method);
-
             invocation.ReturnValue = InterceptAsyncNonGeneric(invocation);
         }
 
@@ -73,8 +69,6 @@ namespace SilkRoute.Proxy
 
         public void InterceptAsynchronous<TResult>(IInvocation invocation)
         {
-            EnsureInitialized(invocation.Method);
-
             invocation.ReturnValue = InterceptAsyncGeneric<TResult>(invocation);
         }
 
@@ -90,6 +84,8 @@ namespace SilkRoute.Proxy
 
         private async Task<object?> Invoke(MethodInfo targetMethod, object?[] args)
         {
+            EnsureInitialized(targetMethod);
+
             var (method, uri, content, headers) = PrepareRequest(targetMethod, args);
 
             var (response, json) = await SendAndReadResponse(method, uri, content, headers)

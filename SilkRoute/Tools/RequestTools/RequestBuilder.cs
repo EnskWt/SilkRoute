@@ -29,7 +29,7 @@ namespace SilkRoute.Tools.RequestTools
 
 
         private readonly List<IRequestContentBinder> _contentBinders;
-        private readonly List<IRequestParametersBinder> _attributeBinders;
+        private readonly List<IRequestParametersBinder> _parameterBinders;
 
         internal RequestBuilder(HttpMethod method, string uriTemplate)
         {
@@ -43,7 +43,7 @@ namespace SilkRoute.Tools.RequestTools
                 new ExplicitBodyContentBinder()
             }.OrderBy(x => x.Priority).ToList();
 
-            _attributeBinders = new List<IRequestParametersBinder>()
+            _parameterBinders = new List<IRequestParametersBinder>()
             {
                 new FormParametersBinder(),
                 new HeaderParametersBinder(),
@@ -140,7 +140,7 @@ namespace SilkRoute.Tools.RequestTools
                 var value = args != null && i < args.Length ? args[i] : null;
 
                 if (value == null) continue;
-                foreach (var binder in _attributeBinders)
+                foreach (var binder in _parameterBinders)
                 {
                     if (binder.CanBind(parameter, value))
                     {

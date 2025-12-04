@@ -11,7 +11,7 @@ namespace SilkRoute.Tools.RequestTools.RequestBodyFactory
     internal class HttpContentFactory : IRequestBodyFactory
     {
         public int Priority => 0;
-        public bool CanHandle(object val) => val is HttpContent;
+        public bool CanCreate(object val) => val is HttpContent;
         public HttpContent Create(object val) => (HttpContent)val;
     }
 }

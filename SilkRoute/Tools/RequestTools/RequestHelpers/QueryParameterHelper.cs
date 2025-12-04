@@ -68,7 +68,7 @@ namespace SilkRoute.Tools.RequestTools.RequestHelpers
         {
             if (RequestTypeHelper.ContainsNonExplicitFormData(value))
                 throw new InvalidOperationException(
-                    $"Cannot bind file data in parameter '{name}' to query string. Use [FromForm] or remove file parameter.");
+                    $"Cannot bind form data in parameter '{name}' to query string. Use [FromForm] or remove form data parameter.");
         }
 
         private static void ThrowIfContainsStream(string name, object value)
