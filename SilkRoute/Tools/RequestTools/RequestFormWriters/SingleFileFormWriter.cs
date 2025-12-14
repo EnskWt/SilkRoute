@@ -4,7 +4,7 @@ using SilkRoute.Tools.RequestTools.RequestFormWriters.WriterContract;
 
 namespace SilkRoute.Tools.RequestTools.RequestFormWriters
 {
-    internal class SingleFileWriter : IRequestFormWriter
+    internal class SingleFileFormWriter : IRequestFormWriter
     {
         public int Priority => 0;
         public bool CanWrite(object val) => val is IFormFile;

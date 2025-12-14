@@ -4,7 +4,7 @@ using SilkRoute.Tools.RequestTools.RequestHelpers;
 
 namespace SilkRoute.Tools.RequestTools.RequestFormWriters
 {
-    internal class EnumerableContentWriter : IRequestFormWriter
+    internal class EnumerableContentFormWriter : IRequestFormWriter
     {
         public int Priority => 3;
         public bool CanWrite(object val) => val is IEnumerable && val is not string;

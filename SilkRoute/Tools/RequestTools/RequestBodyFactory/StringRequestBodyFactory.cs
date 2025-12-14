@@ -3,7 +3,7 @@ using SilkRoute.Tools.RequestTools.RequestBodyFactory.FactoryContract;
 
 namespace SilkRoute.Tools.RequestTools.RequestBodyFactory
 {
-    internal class StringFactory : IRequestBodyFactory
+    internal class StringRequestBodyFactory : IRequestBodyFactory
     {
         public int Priority => 3;
         public bool CanCreate(object val) => val is string;

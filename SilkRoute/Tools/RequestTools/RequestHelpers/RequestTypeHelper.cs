@@ -40,6 +40,8 @@ namespace SilkRoute.Tools.RequestTools.RequestHelpers
 
         internal static bool ContainsStream(object? val) => ContainsType<Stream>(val, includeTopLevel: true);
 
+        internal static bool ContainsByteArray(object? val) => ContainsType<byte[]>(val, includeTopLevel: true);
+
         internal static bool ContainsNestedStream(object? val) => ContainsType<Stream>(val, includeTopLevel: false);
     }
 }

@@ -3,7 +3,7 @@ using SilkRoute.Tools.RequestTools.RequestHelpers;
 
 namespace SilkRoute.Tools.RequestTools.RequestFormWriters
 {
-    internal class PrimitiveContentWriter : IRequestFormWriter
+    internal class PrimitiveContentFormWriter : IRequestFormWriter
     {
         public int Priority => 2;
         public bool CanWrite(object val) => RequestTypeHelper.IsPrimitive(val.GetType());

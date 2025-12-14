@@ -3,7 +3,7 @@ using SilkRoute.Tools.RequestTools.RequestBodyFactory.FactoryContract;
 
 namespace SilkRoute.Tools.RequestTools.RequestBodyFactory
 {
-    internal class StreamFactory : IRequestBodyFactory
+    internal class StreamRequestBodyFactory : IRequestBodyFactory
     {
         public int Priority => 1;
         public bool CanCreate(object val) => val is Stream;

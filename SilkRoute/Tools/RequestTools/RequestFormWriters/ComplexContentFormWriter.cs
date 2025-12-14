@@ -5,7 +5,7 @@ using SilkRoute.Tools.RequestTools.RequestHelpers;
 
 namespace SilkRoute.Tools.RequestTools.RequestFormWriters
 {
-    internal class ComplexContentWriter : IRequestFormWriter
+    internal class ComplexContentFormWriter : IRequestFormWriter
     {
         public int Priority => 4;
 

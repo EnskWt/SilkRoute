@@ -4,7 +4,7 @@ using SilkRoute.Tools.RequestTools.RequestHelpers;
 
 namespace SilkRoute.Tools.RequestTools.RequestFormWriters
 {
-    internal class MultipleFilesWriter : IRequestFormWriter
+    internal class MultipleFilesFormWriter : IRequestFormWriter
     {
         public int Priority => 1;
         public bool CanWrite(object val) => val is IEnumerable<IFormFile>;

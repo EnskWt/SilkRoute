@@ -14,6 +14,7 @@ namespace SilkRoute.Tools.RequestTools.RequestHelpers
 
             ThrowIfContainsFormData(parameterName, parameterValue);
             ThrowIfContainsStream(parameterName, parameterValue);
+            ThrowIfContainsByteArray(parameterName, parameterValue);
 
             var token = JToken.FromObject(parameterValue);
 
@@ -68,6 +69,13 @@ namespace SilkRoute.Tools.RequestTools.RequestHelpers
             if (RequestTypeHelper.ContainsStream(value))
                 throw new InvalidOperationException(
                     $"Cannot bind stream data in parameter '{name}' to query string. Use [FromBody] or remove stream parameter.");
+        }
+
+        private static void ThrowIfContainsByteArray(string name, object value)
+        {
+            if (RequestTypeHelper.ContainsByteArray(value))
+                throw new InvalidOperationException(
+                    $"Cannot bind byte array data in parameter '{name}' to query string. Use [FromBody] or remove stream parameter.");
         }
     }
 }

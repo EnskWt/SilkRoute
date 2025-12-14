@@ -4,7 +4,7 @@ using SilkRoute.Tools.RequestTools.RequestBodyFactory.FactoryContract;
 
 namespace SilkRoute.Tools.RequestTools.RequestBodyFactory
 {
-    internal class JsonFactory : IRequestBodyFactory
+    internal class JsonRequestBodyFactory : IRequestBodyFactory
     {
         public int Priority => int.MaxValue;
         public bool CanCreate(object val) => true;

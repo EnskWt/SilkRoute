@@ -2,7 +2,7 @@
 
 namespace SilkRoute.Tools.RequestTools.RequestBodyFactory
 {
-    internal class ByteArrayFactory : IRequestBodyFactory
+    internal class ByteArrayRequestBodyFactory : IRequestBodyFactory
     {
         public int Priority => 2;
         public bool CanCreate(object val) => val is byte[];

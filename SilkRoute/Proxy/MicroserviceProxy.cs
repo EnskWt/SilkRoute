@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Newtonsoft.Json;
 using SilkRoute.Interfaces;
+using SilkRoute.Tools.ActionResultTools;
 using SilkRoute.Tools.RequestTools;
+using SilkRoute.Tools.ResponseTools;
 
 namespace SilkRoute.Proxy
 {
@@ -72,13 +73,15 @@ namespace SilkRoute.Proxy
 
             var (method, uri, content, headers) = PrepareRequest(targetMethod, args);
 
-            var (response, json) = await SendAndReadResponse(method, uri, content, headers)
+            var response = await SendRequest(method, uri, content, headers)
                 .ConfigureAwait(false);
 
             var (responseType, _) = GetReturnTypeInfo(targetMethod);
             var (isActionResult, payloadType) = GetPayloadInfo(responseType);
 
-            object? payload = DeserializePayload(json, payloadType);
+            object? payload = await ReadResponse(response, responseType, payloadType, isActionResult)
+                .ConfigureAwait(false);
+
             object result = BuildResult(response, responseType, isActionResult, payload);
 
             return result;
@@ -137,26 +140,56 @@ namespace SilkRoute.Proxy
         }
 
         /// <summary>
-        /// Sends the HTTP request and reads the response.
+        /// Sends the HTTP request and returns response.
         /// </summary>
         /// <param name="method"></param>
         /// <param name="uri"></param>
         /// <param name="content"></param>
+        /// <param name="headers"></param>
         /// <returns></returns>
         /// <exception cref="HttpRequestException"></exception>
-        private async Task<(HttpResponseMessage response, string json)> SendAndReadResponse(string method, string uri, HttpContent? content, IDictionary<string, string> headers)
+        private async Task<HttpResponseMessage> SendRequest(
+            string method,
+            string uri,
+            HttpContent? content,
+            IDictionary<string, string> headers)
         {
-            var request = new HttpRequestMessage(new HttpMethod(method), uri) { Content = content };
+            var request = new HttpRequestMessage(new HttpMethod(method), uri)
+            {
+                Content = content
+            };
 
             foreach (var header in headers)
             {
                 request.Headers.TryAddWithoutValidation(header.Key, header.Value);
             }
 
-            var response = await _httpClient!.SendAsync(request);
-            var json = await response.Content.ReadAsStringAsync();
+            return await _httpClient!.SendAsync(
+                    request,
+                    HttpCompletionOption.ResponseHeadersRead)
+                .ConfigureAwait(false);
+        }
 
-            return (response, json);
+        /// <summary>
+        /// Properly reads response content
+        /// </summary>
+        /// <param name="response"></param>
+        /// <param name="responseType"></param>
+        /// <param name="payloadType"></param>
+        /// <returns></returns>
+        private Task<object?> ReadResponse(
+            HttpResponseMessage response,
+            Type responseType,
+            Type payloadType,
+            bool isActionResult)
+        {
+            var responseReader = new ResponseReader();
+
+            return responseReader.ReadResponseContent(
+                response,
+                responseType,
+                payloadType,
+                isActionResult);
         }
 
         /// <summary>
@@ -191,30 +224,10 @@ namespace SilkRoute.Proxy
             var payloadType = isActionResult
                 ? (responseType.IsGenericType
                     ? responseType.GetGenericArguments()[0]
-                    : typeof(string))
+                    : responseType)
                 : responseType;
 
             return (isActionResult, payloadType);
-        }
-
-        /// <summary>
-        /// Deserializes the JSON payload into the specified type.
-        /// </summary>
-        /// <param name="json"></param>
-        /// <param name="payloadType"></param>
-        /// <returns></returns>
-        private object? DeserializePayload(string json, Type payloadType)
-        {
-            // If the payload type is void, return null
-            if (payloadType == typeof(void))
-                return null;
-
-            // If the payload type is a string, return the JSON string
-            if (payloadType == typeof(string))
-                return json;
-
-            // If the payload type is a object, deserialize it into a specified payload type
-            return JsonConvert.DeserializeObject(json, payloadType)!;
         }
 
         /// <summary>
@@ -225,70 +238,18 @@ namespace SilkRoute.Proxy
         /// <param name="isActionResult"></param>
         /// <param name="payload"></param>
         /// <returns></returns>
-        private object BuildResult(HttpResponseMessage response, Type responseType, bool isActionResult, object? payload)
+        private object BuildResult(
+            HttpResponseMessage response,
+            Type responseType,
+            bool isActionResult,
+            object? payload)
         {
-            // If the response type is not an ActionResult, we need to return the payload directly, otgerwise we need to wrap it in an ActionResult
             if (!isActionResult)
                 return payload!;
 
-            // Receive the status code from the original response
-            var statusCode = (int)response.StatusCode;
+            var actionResultWrapperFactory = new ActionResultWrapperFactory();
 
-            // For ActionResult<>:
-
-            // If the response type is an ActionResult with a generic type, we need to create an instance of the ActionResult with the payload
-            if (responseType.IsGenericType)
-            {
-                var argType = responseType.GetGenericArguments()[0];
-
-                object? effectivePayload = payload
-                  ?? (argType.IsValueType
-                        ? Activator.CreateInstance(argType)!
-                        : null);
-
-                var ctor = responseType
-                    .GetConstructors(BindingFlags.Public | BindingFlags.Instance)
-                    .FirstOrDefault(ci =>
-                    {
-                        var ps = ci.GetParameters();
-                        return ps.Length == 1
-                               && ps[0].ParameterType == argType;
-                    });
-
-                if (ctor == null)
-                {
-                    throw new InvalidOperationException(
-                        $"No suitable constructor found for {responseType.Name}({argType.Name})");
-                }
-
-                return ctor.Invoke(new[] { effectivePayload! });
-            }
-
-            // For non-generic ActionResult that inherits from ObjectResult:
-
-            // If the response type is not direct ActionResult with generic type, we need to create an instance of the specific ActionResult type with payload as value (usually string)
-            if (typeof(ObjectResult).IsAssignableFrom(responseType))
-            {
-                var obj = (ObjectResult)Activator.CreateInstance(responseType, payload)!;
-                obj.StatusCode = statusCode;
-                return obj;
-            }
-
-            // For all other cases, we need to create an instance of the ContentResult with payload as value (usually string) or StatusCodeResult:
-
-            // If the payload is null, we need to create an instance of the StatusCodeResult with the status code
-            if (payload == null)
-            {
-                return Activator.CreateInstance(typeof(StatusCodeResult), statusCode)!;
-            }
-
-            // For cases when payload is not null and return type is like IActionResult, ActionResult etc., we need to return result as ContentResult as we received since we can't create an instance of IActionResult or ActionResult and we can't know real return type (like OkResult, JsonResult etc.) that was returned in method as well.
-            return new ContentResult
-            {
-                Content = payload.ToString()!,
-                ContentType = "application/json",
-                StatusCode = statusCode
-            };
+            return actionResultWrapperFactory.Wrap(response, responseType, payload);
         }
     }
 }

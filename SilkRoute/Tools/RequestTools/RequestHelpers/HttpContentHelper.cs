@@ -9,20 +9,19 @@ namespace SilkRoute.Tools.RequestTools.RequestHelpers
     {
         private static readonly List<IRequestBodyFactory> _bodyFactories = new List<IRequestBodyFactory>
         {
-            new HttpContentFactory(),
-            new StreamFactory(),
-            new ByteArrayFactory(),
-            new StringFactory(),
-            new JsonFactory()
+            new StreamRequestBodyFactory(),
+            new ByteArrayRequestBodyFactory(),
+            new StringRequestBodyFactory(),
+            new JsonRequestBodyFactory()
         }.OrderBy(x => x.Priority).ToList();
 
         private static readonly List<IRequestFormWriter> _formWriters = new List<IRequestFormWriter>
         {
-            new SingleFileWriter(),
-            new MultipleFilesWriter(),
-            new PrimitiveContentWriter(),
-            new EnumerableContentWriter(),
-            new ComplexContentWriter()
+            new SingleFileFormWriter(),
+            new MultipleFilesFormWriter(),
+            new PrimitiveContentFormWriter(),
+            new EnumerableContentFormWriter(),
+            new ComplexContentFormWriter()
         }.OrderBy(x => x.Priority).ToList();
 
         internal static HttpContent BuildBodyContent(object val)
