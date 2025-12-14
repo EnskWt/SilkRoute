@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilkRoute", "SilkRoute\Silk
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilkRoute.Demo.Shared", "SilkRoute.Demo.Shared\SilkRoute.Demo.Shared.csproj", "{57BEF781-63BF-475B-AF2E-192D65F69A7A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilkRoute.Demo.TestMicroservice", "SilkRoute.Demo.TestMicroservice\SilkRoute.Demo.TestMicroservice.csproj", "{4A53E950-BC3A-42EE-964A-4E1B26711620}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{57BEF781-63BF-475B-AF2E-192D65F69A7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57BEF781-63BF-475B-AF2E-192D65F69A7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57BEF781-63BF-475B-AF2E-192D65F69A7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A53E950-BC3A-42EE-964A-4E1B26711620}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A53E950-BC3A-42EE-964A-4E1B26711620}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A53E950-BC3A-42EE-964A-4E1B26711620}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A53E950-BC3A-42EE-964A-4E1B26711620}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

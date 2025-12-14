@@ -12,142 +12,142 @@ namespace SilkRoute.Demo.Shared.Contracts
         #region Query
 
         [HttpGet("api/test/bind/query/contains-primitives")]
-        Task<EchoResponse> Query_Contains_Primitives([FromQuery] int id, [FromQuery] bool flag, [FromQuery] string name);
+        Task<RequestSnapshot> Query_Contains_Primitives([FromQuery] int id, [FromQuery] bool flag, [FromQuery] string name);
 
         [HttpGet("api/test/bind/query/contains-primitive-collections")]
-        Task<EchoResponse> Query_Contains_Primitive_Collections([FromQuery] int[] ids, [FromQuery] List<string> tags);
+        Task<RequestSnapshot> Query_Contains_Primitive_Collections([FromQuery] int[] ids, [FromQuery] List<string> tags);
 
         [HttpGet("api/test/bind/query/contains-complexdto")]
-        Task<ComplexDto> Query_Contains_ComplexDto([FromQuery] ComplexDto dto);
+        Task<RequestSnapshot> Query_Contains_ComplexDto([FromQuery] ComplexDto dto);
 
         [HttpGet("api/test/bind/query/contains-nesteddto")]
-        Task<NestedDto> Query_Contains_NestedDto([FromQuery] NestedDto dto);
+        Task<RequestSnapshot> Query_Contains_NestedDto([FromQuery] NestedDto dto);
 
         [HttpGet("api/test/bind/query/contains-complexdto-and-primitive")]
-        Task<ComplexDto> Query_Contains_ComplexDto_And_Primitive([FromQuery] ComplexDto dto, [FromQuery] int id);
+        Task<RequestSnapshot> Query_Contains_ComplexDto_And_Primitive([FromQuery] ComplexDto dto, [FromQuery] int id);
 
         [HttpGet("api/test/bind/query/contains-nullables")]
-        Task<EchoResponse> Query_Contains_Nullables([FromQuery] int? id, [FromQuery] string? name);
+        Task<RequestSnapshot> Query_Contains_Nullables([FromQuery] int? id, [FromQuery] string? name);
 
         [HttpGet("api/test/bind/query/contains-stream")]
-        Task<EchoResponse> Query_Contains_Stream([FromQuery] DtoWithNestedStream dto);
+        Task<RequestSnapshot> Query_Contains_Stream([FromQuery] DtoWithNestedStream dto);
 
         [HttpGet("api/test/bind/query/contains-bytes")]
-        Task<EchoResponse> Query_Contains_Bytes([FromQuery] DtoWithNestedBytes dto);
+        Task<RequestSnapshot> Query_Contains_Bytes([FromQuery] DtoWithNestedBytes dto);
 
         #endregion
 
         #region Route and Header
 
         [HttpGet("api/test/bind/route/contains-primitive/{id:int}")]
-        Task<EchoResponse> Route_Contains_Primitive([FromRoute] int id);
+        Task<RequestSnapshot> Route_Contains_Primitive([FromRoute] int id);
 
         [HttpGet("api/test/bind/header/contains-primitive")]
-        Task<EchoResponse> Header_Contains_Primitive([FromHeader(Name = "X-Test")] string value);
+        Task<RequestSnapshot> Header_Contains_Primitive([FromHeader(Name = "X-Test")] string value);
 
         #endregion
 
         #region Body
 
         [HttpPost("api/test/bind/body/contains-complexdto")]
-        Task<ComplexDto> Body_Contains_ComplexDto([FromBody] ComplexDto dto);
+        Task<RequestSnapshot> Body_Contains_ComplexDto([FromBody] ComplexDto dto);
 
         [HttpPost("api/test/bind/body/contains-primitive")]
-        Task<EchoResponse> Body_Contains_Primitive([FromBody] string text);
+        Task<RequestSnapshot> Body_Contains_Primitive([FromBody] string text);
 
         [HttpPost("api/test/bind/body/contains-stream")]
-        Task<EchoResponse> Body_Contains_Stream([FromBody] Stream body);
+        Task<RequestSnapshot> Body_Contains_Stream([FromBody] Stream body);
 
         [HttpPost("api/test/bind/body/contains-bytes")]
-        Task<EchoResponse> Body_Contains_Bytes([FromBody] byte[] body);
+        Task<RequestSnapshot> Body_Contains_Bytes([FromBody] byte[] body);
 
         [HttpPost("api/test/bind/body/contains-dto-with-nested-stream")]
-        Task<EchoResponse> Body_Contains_DtoWithNestedStream([FromBody] DtoWithNestedStream dto);
+        Task<RequestSnapshot> Body_Contains_DtoWithNestedStream([FromBody] DtoWithNestedStream dto);
 
         [HttpPost("api/test/bind/body/contains-dto-with-nested-bytes")]
-        Task<EchoResponse> Body_Contains_DtoWithNestedBytes([FromBody] DtoWithNestedBytes dto);
+        Task<RequestSnapshot> Body_Contains_DtoWithNestedBytes([FromBody] DtoWithNestedBytes dto);
 
         [HttpPost("api/test/bind/body/contains-dto-with-nested-formdata")]
-        Task<EchoResponse> Body_Contains_DtoWithNestedFormData([FromBody] DtoWithNestedFormData dto);
+        Task<RequestSnapshot> Body_Contains_DtoWithNestedFormData([FromBody] DtoWithNestedFormData dto);
 
         [HttpPost("api/test/bind/invalid/two-bodies")]
-        Task<EchoResponse> Two_Bodies([FromBody] ComplexDto a, [FromBody] ComplexDto b);
+        Task<RequestSnapshot> Two_Bodies([FromBody] ComplexDto a, [FromBody] ComplexDto b);
 
         #endregion
 
         #region Form
 
         [HttpPost("api/test/bind/form/contains-primitives")]
-        Task<EchoResponse> Form_Contains_Primitives([FromForm] string name, [FromForm] int id);
+        Task<RequestSnapshot> Form_Contains_Primitives([FromForm] string name, [FromForm] int id);
 
         [HttpPost("api/test/bind/form/contains-iformfile")]
-        Task<EchoResponse> Form_Contains_IFormFile([FromForm] IFormFile file);
+        Task<RequestSnapshot> Form_Contains_IFormFile([FromForm] IFormFile file);
 
         [HttpPost("api/test/bind/form/contains-iformfile-and-primitives")]
-        Task<EchoResponse> Form_Contains_IFormFile_And_Primitives([FromForm] IFormFile file, [FromForm] string comment);
+        Task<RequestSnapshot> Form_Contains_IFormFile_And_Primitives([FromForm] IFormFile file, [FromForm] string comment);
 
         [HttpPost("api/test/bind/form/contains-iformfiles")]
-        Task<EchoResponse> Form_Contains_IFormFiles([FromForm] List<IFormFile> files);
+        Task<RequestSnapshot> Form_Contains_IFormFiles([FromForm] List<IFormFile> files);
 
         #endregion
 
         #region Body and Form combining
 
         [HttpPost("api/test/bind/invalid/body-complexdto-and-form-primitive")]
-        Task<EchoResponse> BodyComplexDto_And_FormPrimitive([FromBody] ComplexDto dto, [FromForm] string formValue);
+        Task<RequestSnapshot> BodyComplexDto_And_FormPrimitive([FromBody] ComplexDto dto, [FromForm] string formValue);
 
         [HttpPost("api/test/bind/invalid/body-complexdto-and-iformfile")]
-        Task<EchoResponse> BodyComplexDto_And_IFormFile([FromBody] ComplexDto dto, IFormFile file);
+        Task<RequestSnapshot> BodyComplexDto_And_IFormFile([FromBody] ComplexDto dto, IFormFile file);
 
         #endregion
 
         #region No Attributes
 
         [HttpPost("api/test/bind/noattr/two-complexdtos/order-1-2")]
-        Task<EchoResponse> NoAttr_TwoComplexDtos_Order_1_2(ComplexDto dto1, ComplexDto dto2);
+        Task<RequestSnapshot> NoAttr_TwoComplexDtos_Order_1_2(ComplexDto dto1, ComplexDto dto2);
 
         [HttpPost("api/test/bind/noattr/two-complexdtos/order-2-1")]
-        Task<EchoResponse> NoAttr_TwoComplexDtos_Order_2_1(ComplexDto dto2, ComplexDto dto1);
+        Task<RequestSnapshot> NoAttr_TwoComplexDtos_Order_2_1(ComplexDto dto2, ComplexDto dto1);
 
         [HttpPost("api/test/bind/noattr/complexdto-and-bytes")]
-        Task<EchoResponse> NoAttr_ComplexDto_And_Bytes(ComplexDto dto, byte[] bytes);
+        Task<RequestSnapshot> NoAttr_ComplexDto_And_Bytes(ComplexDto dto, byte[] bytes);
 
         [HttpPost("api/test/bind/noattr/bytes-and-complexdto")]
-        Task<EchoResponse> NoAttr_Bytes_And_ComplexDto(byte[] bytes, ComplexDto dto);
+        Task<RequestSnapshot> NoAttr_Bytes_And_ComplexDto(byte[] bytes, ComplexDto dto);
 
         [HttpPost("api/test/bind/noattr/complexdto-and-stream")]
-        Task<EchoResponse> NoAttr_ComplexDto_And_Stream(ComplexDto dto, Stream stream);
+        Task<RequestSnapshot> NoAttr_ComplexDto_And_Stream(ComplexDto dto, Stream stream);
 
         [HttpPost("api/test/bind/noattr/stream-and-complexdto")]
-        Task<EchoResponse> NoAttr_Stream_And_ComplexDto(Stream stream, ComplexDto dto);
+        Task<RequestSnapshot> NoAttr_Stream_And_ComplexDto(Stream stream, ComplexDto dto);
 
         [HttpPost("api/test/bind/noattr/primitive-also-in-route-template-and-primitive-and-complexdto/{id:int}")]
-        Task<EchoResponse> NoAttr_PrimitiveAlsoInRouteTemplate_Primitive_And_ComplexDto(int id, string q, ComplexDto dto);
+        Task<RequestSnapshot> NoAttr_PrimitiveAlsoInRouteTemplate_Primitive_And_ComplexDto(int id, string q, ComplexDto dto);
 
-        [HttpPost("api/test/bind/noattr/complexdto_and-primitive-also-in-route-template-and-primitive/{id:int}")]
-        Task<EchoResponse> NoAttr_ComplexDto_And_PrimitiveAlsoInRouteTemplate_And_Primitive(ComplexDto dto, int id, string q);
+        [HttpPost("api/test/bind/noattr/complexdto-and-primitive-also-in-route-template-and-primitive/{id:int}")]
+        Task<RequestSnapshot> NoAttr_ComplexDto_And_PrimitiveAlsoInRouteTemplate_And_Primitive(ComplexDto dto, int id, string q);
 
         [HttpPost("api/test/bind/noattr/iformfile-and-primitive")]
-        Task<EchoResponse> NoAttr_IFormFile_And_Primitive(IFormFile file, string comment);
+        Task<RequestSnapshot> NoAttr_IFormFile_And_Primitive(IFormFile file, string comment);
 
         #endregion
 
         #region Mixed different attributes
 
         [HttpPost("api/test/bind/allattrs/route-primitive-also-in-route-template-and-query-primitive-and-body-complexdto/{id:int}")]
-        Task<EchoResponse> AllAttrs_RoutePrimitiveAlsoInRouteTemplate_And_QueryPrimitive_And_BodyComplexDto([FromRoute] int id, [FromQuery] string q, [FromBody] ComplexDto dto);
+        Task<RequestSnapshot> AllAttrs_RoutePrimitiveAlsoInRouteTemplate_And_QueryPrimitive_And_BodyComplexDto([FromRoute] int id, [FromQuery] string q, [FromBody] ComplexDto dto);
 
         [HttpPost("api/test/bind/allattrs/route-primitive-also-in-route-template-and-header-primitive-and-body-complexdto/{id:int}")]
-        Task<EchoResponse> AllAttrs_RoutePrimitiveAlsoInRouteTemplate_And_HeaderPrimitive_And_BodyComplexDto([FromRoute] int id, [FromHeader(Name = "X-Trace")] string traceId, [FromBody] ComplexDto dto);
+        Task<RequestSnapshot> AllAttrs_RoutePrimitiveAlsoInRouteTemplate_And_HeaderPrimitive_And_BodyComplexDto([FromRoute] int id, [FromHeader(Name = "X-Trace")] string traceId, [FromBody] ComplexDto dto);
 
         [HttpGet("api/test/bind/allattrs/route-primitive-also-in-route-template-and-query-primitive-and-header-primitive/{id:int}")]
-        Task<EchoResponse> AllAttrs_RoutePrimitiveAlsoInRouteTemplate_And_QueryPrimitive_And_HeaderPrimitive(
+        Task<RequestSnapshot> AllAttrs_RoutePrimitiveAlsoInRouteTemplate_And_QueryPrimitive_And_HeaderPrimitive(
             [FromRoute] int id,
             [FromQuery] string q,
             [FromHeader(Name = "X-Test")] string header);
 
         [HttpPost("api/test/bind/allattrs/form-primitive-and-header-primitive")]
-        Task<EchoResponse> AllAttrs_FormPrimitive_And_HeaderPrimitive(
+        Task<RequestSnapshot> AllAttrs_FormPrimitive_And_HeaderPrimitive(
             [FromForm] string comment,
             [FromHeader(Name = "X-Trace")] string traceId);
 
@@ -156,25 +156,25 @@ namespace SilkRoute.Demo.Shared.Contracts
         #region Mixed different attributes and no attributes
 
         [HttpPost("api/test/bind/mixed/route-primitive-also-in-route-template-and-primitive-and-complexdto/{id:int}")]
-        Task<EchoResponse> Mixed_RoutePrimitiveAlsoInRouteTemplate_And_Primitive_And_ComplexDto([FromRoute] int id, string q, ComplexDto dto);
+        Task<RequestSnapshot> Mixed_RoutePrimitiveAlsoInRouteTemplate_And_Primitive_And_ComplexDto([FromRoute] int id, string q, ComplexDto dto);
 
         [HttpPost("api/test/bind/mixed/primitive-also-in-route-template-and-query-primitive-and-complexdto/{id:int}")]
-        Task<EchoResponse> Mixed_PrimitiveAlsoInRouteTemplate_And_QueryPrimitive_And_ComplexDto(int id, [FromQuery] string q, ComplexDto dto);
+        Task<RequestSnapshot> Mixed_PrimitiveAlsoInRouteTemplate_And_QueryPrimitive_And_ComplexDto(int id, [FromQuery] string q, ComplexDto dto);
 
         [HttpPost("api/test/bind/mixed/query-complexdto-and-complexdto")]
-        Task<EchoResponse> Mixed_QueryComplexDto_And_ComplexDto([FromQuery] ComplexDto dtoQuery, ComplexDto dtoBody);
+        Task<RequestSnapshot> Mixed_QueryComplexDto_And_ComplexDto([FromQuery] ComplexDto dtoQuery, ComplexDto dtoBody);
 
         [HttpPost("api/test/bind/mixed/body-complexdto-and-primitives")]
-        Task<EchoResponse> Mixed_BodyComplexDto_And_Primitives([FromBody] ComplexDto dto, int page, string tag);
+        Task<RequestSnapshot> Mixed_BodyComplexDto_And_Primitives([FromBody] ComplexDto dto, int page, string tag);
 
         [HttpPost("api/test/bind/mixed/body-complexdto-and-complexdto")]
-        Task<EchoResponse> Mixed_BodyComplexDto_And_ComplexDto([FromBody] ComplexDto dto1, ComplexDto dto2);
+        Task<RequestSnapshot> Mixed_BodyComplexDto_And_ComplexDto([FromBody] ComplexDto dto1, ComplexDto dto2);
 
         [HttpPost("api/test/bind/mixed/iformfile-and-form-primitive")]
-        Task<EchoResponse> Mixed_IFormFile_And_FormPrimitive(IFormFile file, [FromForm] string comment);
+        Task<RequestSnapshot> Mixed_IFormFile_And_FormPrimitive(IFormFile file, [FromForm] string comment);
 
         [HttpPost("api/test/bind/mixed/query-primitive-also-in-route-template-and-primitive-and-complexdto/{id:int}")]
-        Task<EchoResponse> Mixed_QueryPrimitiveAlsoInRouteTemplate_Primitive_ComplexDto([FromQuery] int id, string q, ComplexDto dto);
+        Task<RequestSnapshot> Mixed_QueryPrimitiveAlsoInRouteTemplate_And_Primitive_And_ComplexDto([FromQuery] int id, string q, ComplexDto dto);
 
         #endregion
 
