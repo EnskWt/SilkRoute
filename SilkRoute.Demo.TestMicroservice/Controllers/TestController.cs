@@ -88,7 +88,6 @@ namespace SilkRoute.Demo.TestMicroservice.Controllers
         public Task<RequestSnapshot> Body_Contains_DtoWithNestedFormData([FromBody] DtoWithNestedFormData dto)
             => SnapshotAsync(parameters: new { dto = new { dto.Id, dto.Name, File = "(IFormFile nested in DTO)" } }, bodyValue: dto);
 
-        // фреймворк зазвичай не дасть цьому нормально жити, але метод для тестів/контракту є
         [HttpPost("api/test/bind/invalid/two-bodies")]
         public Task<RequestSnapshot> Two_Bodies([FromBody] ComplexDto a, [FromBody] ComplexDto b)
             => SnapshotAsync(parameters: new { a, b }, bodyValue: new { a, b });
