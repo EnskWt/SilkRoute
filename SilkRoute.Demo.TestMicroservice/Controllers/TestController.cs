@@ -88,9 +88,9 @@ namespace SilkRoute.Demo.TestMicroservice.Controllers
         public Task<RequestSnapshot> Body_Contains_DtoWithNestedFormData([FromBody] DtoWithNestedFormData dto)
             => SnapshotAsync(parameters: new { dto = new { dto.Id, dto.Name, File = "(IFormFile nested in DTO)" } }, bodyValue: dto);
 
-        [HttpPost("api/test/bind/invalid/two-bodies")]
-        public Task<RequestSnapshot> Two_Bodies([FromBody] ComplexDto a, [FromBody] ComplexDto b)
-            => SnapshotAsync(parameters: new { a, b }, bodyValue: new { a, b });
+        //[HttpPost("api/test/bind/invalid/two-bodies")]
+        //public Task<RequestSnapshot> Two_Bodies([FromBody] ComplexDto a, [FromBody] ComplexDto b)
+        //    => SnapshotAsync(parameters: new { a, b }, bodyValue: new { a, b });
 
         #endregion
 
@@ -101,11 +101,12 @@ namespace SilkRoute.Demo.TestMicroservice.Controllers
             => SnapshotAsync(parameters: new { name, id }, includeForm: true);
 
         [HttpPost("api/test/bind/form/contains-iformfile")]
-        public Task<RequestSnapshot> Form_Contains_IFormFile([FromForm] IFormFile file)
+        [Consumes("multipart/form-data")]
+        public Task<RequestSnapshot> Form_Contains_IFormFile(/*[FromForm]*/ IFormFile file)
             => SnapshotAsync(parameters: new { file = new { file?.Name, file?.FileName, file?.ContentType, file?.Length } }, includeForm: true);
 
         [HttpPost("api/test/bind/form/contains-iformfile-and-primitives")]
-        public Task<RequestSnapshot> Form_Contains_IFormFile_And_Primitives([FromForm] IFormFile file, [FromForm] string comment)
+        public Task<RequestSnapshot> Form_Contains_IFormFile_And_Primitives(/*[FromForm]*/ IFormFile file, [FromForm] string comment)
             => SnapshotAsync(parameters: new { comment, file = new { file?.Name, file?.FileName, file?.ContentType, file?.Length } }, includeForm: true);
 
         [HttpPost("api/test/bind/form/contains-iformfiles")]
@@ -131,29 +132,29 @@ namespace SilkRoute.Demo.TestMicroservice.Controllers
 
         #region No Attributes
 
-        [HttpPost("api/test/bind/noattr/two-complexdtos/order-1-2")]
-        public Task<RequestSnapshot> NoAttr_TwoComplexDtos_Order_1_2(ComplexDto dto1, ComplexDto dto2)
-            => SnapshotAsync(parameters: new { dto1, dto2 }, bodyValue: dto1);
+        //[HttpPost("api/test/bind/noattr/two-complexdtos/order-1-2")]
+        //public Task<RequestSnapshot> NoAttr_TwoComplexDtos_Order_1_2(ComplexDto dto1, ComplexDto dto2)
+        //    => SnapshotAsync(parameters: new { dto1, dto2 }, bodyValue: dto1);
 
-        [HttpPost("api/test/bind/noattr/two-complexdtos/order-2-1")]
-        public Task<RequestSnapshot> NoAttr_TwoComplexDtos_Order_2_1(ComplexDto dto2, ComplexDto dto1)
-            => SnapshotAsync(parameters: new { dto2, dto1 }, bodyValue: dto2);
+        //[HttpPost("api/test/bind/noattr/two-complexdtos/order-2-1")]
+        //public Task<RequestSnapshot> NoAttr_TwoComplexDtos_Order_2_1(ComplexDto dto2, ComplexDto dto1)
+        //    => SnapshotAsync(parameters: new { dto2, dto1 }, bodyValue: dto2);
 
-        [HttpPost("api/test/bind/noattr/complexdto-and-bytes")]
-        public Task<RequestSnapshot> NoAttr_ComplexDto_And_Bytes(ComplexDto dto, byte[] bytes)
-            => SnapshotAsync(parameters: new { dto, bytesLength = bytes?.Length }, bodyValue: dto);
+        //[HttpPost("api/test/bind/noattr/complexdto-and-bytes")]
+        //public Task<RequestSnapshot> NoAttr_ComplexDto_And_Bytes(ComplexDto dto, byte[] bytes)
+        //    => SnapshotAsync(parameters: new { dto, bytesLength = bytes?.Length }, bodyValue: dto);
 
-        [HttpPost("api/test/bind/noattr/bytes-and-complexdto")]
-        public Task<RequestSnapshot> NoAttr_Bytes_And_ComplexDto(byte[] bytes, ComplexDto dto)
-            => SnapshotAsync(parameters: new { bytesLength = bytes?.Length, dto }, bodyValue: bytes);
+        //[HttpPost("api/test/bind/noattr/bytes-and-complexdto")]
+        //public Task<RequestSnapshot> NoAttr_Bytes_And_ComplexDto(byte[] bytes, ComplexDto dto)
+        //    => SnapshotAsync(parameters: new { bytesLength = bytes?.Length, dto }, bodyValue: bytes);
 
-        [HttpPost("api/test/bind/noattr/complexdto-and-stream")]
-        public Task<RequestSnapshot> NoAttr_ComplexDto_And_Stream(ComplexDto dto, Stream stream)
-            => SnapshotAsync(parameters: new { dto, stream = "(Stream)" }, bodyValue: dto);
+        //[HttpPost("api/test/bind/noattr/complexdto-and-stream")]
+        //public Task<RequestSnapshot> NoAttr_ComplexDto_And_Stream(ComplexDto dto, Stream stream)
+        //    => SnapshotAsync(parameters: new { dto, stream = "(Stream)" }, bodyValue: dto);
 
-        [HttpPost("api/test/bind/noattr/stream-and-complexdto")]
-        public Task<RequestSnapshot> NoAttr_Stream_And_ComplexDto(Stream stream, ComplexDto dto)
-            => SnapshotAsync(parameters: new { stream = "(Stream)", dto }, bodyValue: stream);
+        //[HttpPost("api/test/bind/noattr/stream-and-complexdto")]
+        //public Task<RequestSnapshot> NoAttr_Stream_And_ComplexDto(Stream stream, ComplexDto dto)
+        //    => SnapshotAsync(parameters: new { stream = "(Stream)", dto }, bodyValue: stream);
 
         [HttpPost("api/test/bind/noattr/primitive-also-in-route-template-and-primitive-and-complexdto/{id:int}")]
         public Task<RequestSnapshot> NoAttr_PrimitiveAlsoInRouteTemplate_Primitive_And_ComplexDto(int id, string q, ComplexDto dto)
@@ -207,9 +208,9 @@ namespace SilkRoute.Demo.TestMicroservice.Controllers
         public Task<RequestSnapshot> Mixed_BodyComplexDto_And_Primitives([FromBody] ComplexDto dto, int page, string tag)
             => SnapshotAsync(parameters: new { dto, page, tag }, bodyValue: dto);
 
-        [HttpPost("api/test/bind/mixed/body-complexdto-and-complexdto")]
-        public Task<RequestSnapshot> Mixed_BodyComplexDto_And_ComplexDto([FromBody] ComplexDto dto1, ComplexDto dto2)
-            => SnapshotAsync(parameters: new { dto1, dto2 }, bodyValue: dto1);
+        //[HttpPost("api/test/bind/mixed/body-complexdto-and-complexdto")]
+        //public Task<RequestSnapshot> Mixed_BodyComplexDto_And_ComplexDto([FromBody] ComplexDto dto1, ComplexDto dto2)
+        //    => SnapshotAsync(parameters: new { dto1, dto2 }, bodyValue: dto1);
 
         [HttpPost("api/test/bind/mixed/iformfile-and-form-primitive")]
         public Task<RequestSnapshot> Mixed_IFormFile_And_FormPrimitive(IFormFile file, [FromForm] string comment)

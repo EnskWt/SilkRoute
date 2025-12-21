@@ -3,33 +3,65 @@ using Microsoft.Net.Http.Headers;
 
 namespace SilkRoute.InputFormatters
 {
-    public class AnyStreamInputFormatter : InputFormatter
+    public sealed class AnyStreamOrBytesInputFormatter : InputFormatter
     {
-        private static readonly string[] _supportedTypes = new[]
+        public AnyStreamOrBytesInputFormatter()
         {
-            "application/octet-stream",
-            "application/pdf",
-            "application/zip",
-            "image/*",
-            "video/*",
-            "audio/*",
-            "multipart/form-data"
-        };
+            // Для "raw body" сценаріїв. Multipart сюди не пхаємо (це не raw stream).
+            SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/octet-stream"));
+            SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/pdf"));
+            SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/zip"));
+            SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("text/plain"));
 
-        public AnyStreamInputFormatter()
-        {
-            foreach (var mediaType in _supportedTypes)
-                SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(mediaType));
+            // Якщо хочеш "все підряд" типу image/* - краще робити це в CanRead
+            // через StartsWith("image/"), бо MediaTypeHeaderValue.Parse("image/*")
+            // може бути не тим, що ти думаєш у різних версіях.
         }
+
+        protected override bool CanReadType(Type type)
+            => type == typeof(Stream) || type == typeof(byte[]);
 
         public override bool CanRead(InputFormatterContext context)
         {
-            return context.ModelType == typeof(Stream);
+            if (!base.CanRead(context))
+                return false;
+
+            var ct = context.HttpContext.Request.ContentType;
+
+            // Дозволяємо також image/* video/* audio/* "по-людськи"
+            if (!string.IsNullOrWhiteSpace(ct))
+            {
+                if (ct.StartsWith("image/", StringComparison.OrdinalIgnoreCase)) return true;
+                if (ct.StartsWith("video/", StringComparison.OrdinalIgnoreCase)) return true;
+                if (ct.StartsWith("audio/", StringComparison.OrdinalIgnoreCase)) return true;
+            }
+
+            return true; // base.CanRead вже перевірив SupportedMediaTypes (якщо ContentType заданий)
         }
 
-        public override Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)
+        public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)
         {
-            return InputFormatterResult.SuccessAsync(context.HttpContext.Request.Body);
+            var request = context.HttpContext.Request;
+            var abort = context.HttpContext.RequestAborted;
+
+            if (context.ModelType == typeof(byte[]))
+            {
+                using var ms = new MemoryStream();
+                await request.Body.CopyToAsync(ms, abort);
+                return await InputFormatterResult.SuccessAsync(ms.ToArray());
+            }
+
+            if (context.ModelType == typeof(Stream))
+            {
+                // Важливо: Request.Body НЕ seekable -> Position може кидати NotSupportedException.
+                // Якщо тобі потрібен seekable стрім (щоб можна було Position=0) – буферизуємо.
+                var ms = new MemoryStream();
+                await request.Body.CopyToAsync(ms, abort);
+                ms.Position = 0;
+                return await InputFormatterResult.SuccessAsync(ms);
+            }
+
+            return await InputFormatterResult.FailureAsync();
         }
     }
 }

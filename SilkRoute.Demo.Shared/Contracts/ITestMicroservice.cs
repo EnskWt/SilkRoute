@@ -70,8 +70,8 @@ namespace SilkRoute.Demo.Shared.Contracts
         [HttpPost("api/test/bind/body/contains-dto-with-nested-formdata")]
         Task<RequestSnapshot> Body_Contains_DtoWithNestedFormData([FromBody] DtoWithNestedFormData dto);
 
-        [HttpPost("api/test/bind/invalid/two-bodies")]
-        Task<RequestSnapshot> Two_Bodies([FromBody] ComplexDto a, [FromBody] ComplexDto b);
+        //[HttpPost("api/test/bind/invalid/two-bodies")]
+        //Task<RequestSnapshot> Two_Bodies([FromBody] ComplexDto a, [FromBody] ComplexDto b);
 
         #endregion
 
@@ -81,10 +81,11 @@ namespace SilkRoute.Demo.Shared.Contracts
         Task<RequestSnapshot> Form_Contains_Primitives([FromForm] string name, [FromForm] int id);
 
         [HttpPost("api/test/bind/form/contains-iformfile")]
-        Task<RequestSnapshot> Form_Contains_IFormFile([FromForm] IFormFile file);
+        [Consumes("multipart/form-data")]
+        Task<RequestSnapshot> Form_Contains_IFormFile(/*[FromForm]*/ IFormFile file);
 
         [HttpPost("api/test/bind/form/contains-iformfile-and-primitives")]
-        Task<RequestSnapshot> Form_Contains_IFormFile_And_Primitives([FromForm] IFormFile file, [FromForm] string comment);
+        Task<RequestSnapshot> Form_Contains_IFormFile_And_Primitives(/*[FromForm]*/ IFormFile file, [FromForm] string comment);
 
         [HttpPost("api/test/bind/form/contains-iformfiles")]
         Task<RequestSnapshot> Form_Contains_IFormFiles([FromForm] List<IFormFile> files);
@@ -103,23 +104,23 @@ namespace SilkRoute.Demo.Shared.Contracts
 
         #region No Attributes
 
-        [HttpPost("api/test/bind/noattr/two-complexdtos/order-1-2")]
-        Task<RequestSnapshot> NoAttr_TwoComplexDtos_Order_1_2(ComplexDto dto1, ComplexDto dto2);
+        //[HttpPost("api/test/bind/noattr/two-complexdtos/order-1-2")]
+        //Task<RequestSnapshot> NoAttr_TwoComplexDtos_Order_1_2(ComplexDto dto1, ComplexDto dto2);
 
-        [HttpPost("api/test/bind/noattr/two-complexdtos/order-2-1")]
-        Task<RequestSnapshot> NoAttr_TwoComplexDtos_Order_2_1(ComplexDto dto2, ComplexDto dto1);
+        //[HttpPost("api/test/bind/noattr/two-complexdtos/order-2-1")]
+        //Task<RequestSnapshot> NoAttr_TwoComplexDtos_Order_2_1(ComplexDto dto2, ComplexDto dto1);
 
-        [HttpPost("api/test/bind/noattr/complexdto-and-bytes")]
-        Task<RequestSnapshot> NoAttr_ComplexDto_And_Bytes(ComplexDto dto, byte[] bytes);
+        //[HttpPost("api/test/bind/noattr/complexdto-and-bytes")]
+        //Task<RequestSnapshot> NoAttr_ComplexDto_And_Bytes(ComplexDto dto, byte[] bytes);
 
-        [HttpPost("api/test/bind/noattr/bytes-and-complexdto")]
-        Task<RequestSnapshot> NoAttr_Bytes_And_ComplexDto(byte[] bytes, ComplexDto dto);
+        //[HttpPost("api/test/bind/noattr/bytes-and-complexdto")]
+        //Task<RequestSnapshot> NoAttr_Bytes_And_ComplexDto(byte[] bytes, ComplexDto dto);
 
-        [HttpPost("api/test/bind/noattr/complexdto-and-stream")]
-        Task<RequestSnapshot> NoAttr_ComplexDto_And_Stream(ComplexDto dto, Stream stream);
+        //[HttpPost("api/test/bind/noattr/complexdto-and-stream")]
+        //Task<RequestSnapshot> NoAttr_ComplexDto_And_Stream(ComplexDto dto, Stream stream);
 
-        [HttpPost("api/test/bind/noattr/stream-and-complexdto")]
-        Task<RequestSnapshot> NoAttr_Stream_And_ComplexDto(Stream stream, ComplexDto dto);
+        //[HttpPost("api/test/bind/noattr/stream-and-complexdto")]
+        //Task<RequestSnapshot> NoAttr_Stream_And_ComplexDto(Stream stream, ComplexDto dto);
 
         [HttpPost("api/test/bind/noattr/primitive-also-in-route-template-and-primitive-and-complexdto/{id:int}")]
         Task<RequestSnapshot> NoAttr_PrimitiveAlsoInRouteTemplate_Primitive_And_ComplexDto(int id, string q, ComplexDto dto);
@@ -167,8 +168,8 @@ namespace SilkRoute.Demo.Shared.Contracts
         [HttpPost("api/test/bind/mixed/body-complexdto-and-primitives")]
         Task<RequestSnapshot> Mixed_BodyComplexDto_And_Primitives([FromBody] ComplexDto dto, int page, string tag);
 
-        [HttpPost("api/test/bind/mixed/body-complexdto-and-complexdto")]
-        Task<RequestSnapshot> Mixed_BodyComplexDto_And_ComplexDto([FromBody] ComplexDto dto1, ComplexDto dto2);
+        //[HttpPost("api/test/bind/mixed/body-complexdto-and-complexdto")]
+        //Task<RequestSnapshot> Mixed_BodyComplexDto_And_ComplexDto([FromBody] ComplexDto dto1, ComplexDto dto2);
 
         [HttpPost("api/test/bind/mixed/iformfile-and-form-primitive")]
         Task<RequestSnapshot> Mixed_IFormFile_And_FormPrimitive(IFormFile file, [FromForm] string comment);

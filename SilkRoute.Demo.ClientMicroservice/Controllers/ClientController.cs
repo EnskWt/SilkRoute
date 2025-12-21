@@ -40,11 +40,11 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
         public async Task<IActionResult> Test_Query_Contains_Nullables([FromQuery] int? id, [FromQuery] string? name)
             => Ok(await _testMicroservice.Query_Contains_Nullables(id, name));
 
-        [HttpGet("api/test/bind/query/test-contains-stream")]
+        [HttpGet("api/test/bind/query/test-contains-stream")] // TO TEST
         public async Task<IActionResult> Test_Query_Contains_Stream([FromQuery] DtoWithNestedStream dto)
             => Ok(await _testMicroservice.Query_Contains_Stream(dto));
 
-        [HttpGet("api/test/bind/query/test-contains-bytes")]
+        [HttpGet("api/test/bind/query/test-contains-bytes")] // TO TEST
         public async Task<IActionResult> Test_Query_Contains_Bytes([FromQuery] DtoWithNestedBytes dto)
             => Ok(await _testMicroservice.Query_Contains_Bytes(dto));
 
@@ -80,7 +80,7 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
         public async Task<IActionResult> Test_Body_Contains_Bytes([FromBody] byte[] body)
             => Ok(await _testMicroservice.Body_Contains_Bytes(body));
 
-        [HttpPost("api/test/bind/body/test-contains-dto-with-nested-stream")]
+        [HttpPost("api/test/bind/body/test-contains-dto-with-nested-stream")] // TO TEST
         public async Task<IActionResult> Test_Body_Contains_DtoWithNestedStream([FromBody] DtoWithNestedStream dto)
             => Ok(await _testMicroservice.Body_Contains_DtoWithNestedStream(dto));
 
@@ -88,13 +88,13 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
         public async Task<IActionResult> Test_Body_Contains_DtoWithNestedBytes([FromBody] DtoWithNestedBytes dto)
             => Ok(await _testMicroservice.Body_Contains_DtoWithNestedBytes(dto));
 
-        [HttpPost("api/test/bind/body/test-contains-dto-with-nested-formdata")]
+        [HttpPost("api/test/bind/body/test-contains-dto-with-nested-formdata")] // TO TEST
         public async Task<IActionResult> Test_Body_Contains_DtoWithNestedFormData([FromBody] DtoWithNestedFormData dto)
             => Ok(await _testMicroservice.Body_Contains_DtoWithNestedFormData(dto));
 
-        [HttpPost("api/test/bind/invalid/test-two-bodies")]
-        public async Task<IActionResult> Test_Two_Bodies([FromBody] ComplexDto a, [FromBody] ComplexDto b)
-            => Ok(await _testMicroservice.Two_Bodies(a, b));
+        //[HttpPost("api/test/bind/invalid/test-two-bodies")]
+        //public async Task<IActionResult> Test_Two_Bodies([FromBody] ComplexDto a, [FromBody] ComplexDto b)
+        //    => Ok(await _testMicroservice.Two_Bodies(a, b));
 
         #endregion
 
@@ -105,11 +105,11 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
             => Ok(await _testMicroservice.Form_Contains_Primitives(name, id));
 
         [HttpPost("api/test/bind/form/test-contains-iformfile")]
-        public async Task<IActionResult> Test_Form_Contains_IFormFile([FromForm] IFormFile file)
+        public async Task<IActionResult> Test_Form_Contains_IFormFile(/*[FromForm]*/ IFormFile file)
             => Ok(await _testMicroservice.Form_Contains_IFormFile(file));
 
         [HttpPost("api/test/bind/form/test-contains-iformfile-and-primitives")]
-        public async Task<IActionResult> Test_Form_Contains_IFormFile_And_Primitives([FromForm] IFormFile file, [FromForm] string comment)
+        public async Task<IActionResult> Test_Form_Contains_IFormFile_And_Primitives(/*[FromForm]*/ IFormFile file, [FromForm] string comment)
             => Ok(await _testMicroservice.Form_Contains_IFormFile_And_Primitives(file, comment));
 
         [HttpPost("api/test/bind/form/test-contains-iformfiles")]
@@ -121,40 +121,40 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
         #region Body and Form combining
 
         [HttpPost("api/test/bind/invalid/test-body-complexdto-and-form-primitive")]
-        public async Task<IActionResult> Test_BodyComplexDto_And_FormPrimitive([FromBody] ComplexDto dto, [FromForm] string formValue)
+        public async Task<IActionResult> Test_BodyComplexDto_And_FormPrimitive([FromBody] ComplexDto dto, [FromForm] string formValue) // TO TEST
             => Ok(await _testMicroservice.BodyComplexDto_And_FormPrimitive(dto, formValue));
 
         [HttpPost("api/test/bind/invalid/test-body-complexdto-and-iformfile")]
-        public async Task<IActionResult> Test_BodyComplexDto_And_IFormFile([FromBody] ComplexDto dto, IFormFile file)
+        public async Task<IActionResult> Test_BodyComplexDto_And_IFormFile([FromBody] ComplexDto dto, IFormFile file) // TO TEST
             => Ok(await _testMicroservice.BodyComplexDto_And_IFormFile(dto, file));
 
         #endregion
 
         #region No Attributes
 
-        [HttpPost("api/test/bind/noattr/test-two-complexdtos/order-1-2")]
-        public async Task<IActionResult> Test_NoAttr_TwoComplexDtos_Order_1_2(ComplexDto dto1, ComplexDto dto2)
-            => Ok(await _testMicroservice.NoAttr_TwoComplexDtos_Order_1_2(dto1, dto2));
+        //[HttpPost("api/test/bind/noattr/test-two-complexdtos/order-1-2")]
+        //public async Task<IActionResult> Test_NoAttr_TwoComplexDtos_Order_1_2(ComplexDto dto1, ComplexDto dto2)
+        //    => Ok(await _testMicroservice.NoAttr_TwoComplexDtos_Order_1_2(dto1, dto2));
 
-        [HttpPost("api/test/bind/noattr/test-two-complexdtos/order-2-1")]
-        public async Task<IActionResult> Test_NoAttr_TwoComplexDtos_Order_2_1(ComplexDto dto2, ComplexDto dto1)
-            => Ok(await _testMicroservice.NoAttr_TwoComplexDtos_Order_2_1(dto2, dto1));
+        //[HttpPost("api/test/bind/noattr/test-two-complexdtos/order-2-1")]
+        //public async Task<IActionResult> Test_NoAttr_TwoComplexDtos_Order_2_1(ComplexDto dto2, ComplexDto dto1)
+        //    => Ok(await _testMicroservice.NoAttr_TwoComplexDtos_Order_2_1(dto2, dto1));
 
-        [HttpPost("api/test/bind/noattr/test-complexdto-and-bytes")]
-        public async Task<IActionResult> Test_NoAttr_ComplexDto_And_Bytes(ComplexDto dto, byte[] bytes)
-            => Ok(await _testMicroservice.NoAttr_ComplexDto_And_Bytes(dto, bytes));
+        //[HttpPost("api/test/bind/noattr/test-complexdto-and-bytes")]
+        //public async Task<IActionResult> Test_NoAttr_ComplexDto_And_Bytes(ComplexDto dto, byte[] bytes)
+        //    => Ok(await _testMicroservice.NoAttr_ComplexDto_And_Bytes(dto, bytes));
 
-        [HttpPost("api/test/bind/noattr/test-bytes-and-complexdto")]
-        public async Task<IActionResult> Test_NoAttr_Bytes_And_ComplexDto(byte[] bytes, ComplexDto dto)
-            => Ok(await _testMicroservice.NoAttr_Bytes_And_ComplexDto(bytes, dto));
+        //[HttpPost("api/test/bind/noattr/test-bytes-and-complexdto")]
+        //public async Task<IActionResult> Test_NoAttr_Bytes_And_ComplexDto(byte[] bytes, ComplexDto dto)
+        //    => Ok(await _testMicroservice.NoAttr_Bytes_And_ComplexDto(bytes, dto));
 
-        [HttpPost("api/test/bind/noattr/test-complexdto-and-stream")]
-        public async Task<IActionResult> Test_NoAttr_ComplexDto_And_Stream(ComplexDto dto, Stream stream)
-            => Ok(await _testMicroservice.NoAttr_ComplexDto_And_Stream(dto, stream));
+        //[HttpPost("api/test/bind/noattr/test-complexdto-and-stream")]
+        //public async Task<IActionResult> Test_NoAttr_ComplexDto_And_Stream(ComplexDto dto, Stream stream)
+        //    => Ok(await _testMicroservice.NoAttr_ComplexDto_And_Stream(dto, stream));
 
-        [HttpPost("api/test/bind/noattr/test-stream-and-complexdto")]
-        public async Task<IActionResult> Test_NoAttr_Stream_And_ComplexDto(Stream stream, ComplexDto dto)
-            => Ok(await _testMicroservice.NoAttr_Stream_And_ComplexDto(stream, dto));
+        //[HttpPost("api/test/bind/noattr/test-stream-and-complexdto")]
+        //public async Task<IActionResult> Test_NoAttr_Stream_And_ComplexDto(Stream stream, ComplexDto dto)
+        //    => Ok(await _testMicroservice.NoAttr_Stream_And_ComplexDto(stream, dto));
 
         [HttpPost("api/test/bind/noattr/test-primitive-also-in-route-template-and-primitive-and-complexdto/{id:int}")]
         public async Task<IActionResult> Test_NoAttr_PrimitiveAlsoInRouteTemplate_Primitive_And_ComplexDto(int id, string q, ComplexDto dto)
@@ -208,9 +208,9 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
         public async Task<IActionResult> Test_Mixed_BodyComplexDto_And_Primitives([FromBody] ComplexDto dto, int page, string tag)
             => Ok(await _testMicroservice.Mixed_BodyComplexDto_And_Primitives(dto, page, tag));
 
-        [HttpPost("api/test/bind/mixed/test-body-complexdto-and-complexdto")]
-        public async Task<IActionResult> Test_Mixed_BodyComplexDto_And_ComplexDto([FromBody] ComplexDto dto1, ComplexDto dto2)
-            => Ok(await _testMicroservice.Mixed_BodyComplexDto_And_ComplexDto(dto1, dto2));
+        //[HttpPost("api/test/bind/mixed/test-body-complexdto-and-complexdto")]
+        //public async Task<IActionResult> Test_Mixed_BodyComplexDto_And_ComplexDto([FromBody] ComplexDto dto1, ComplexDto dto2)
+        //    => Ok(await _testMicroservice.Mixed_BodyComplexDto_And_ComplexDto(dto1, dto2));
 
         [HttpPost("api/test/bind/mixed/test-iformfile-and-form-primitive")]
         public async Task<IActionResult> Test_Mixed_IFormFile_And_FormPrimitive(IFormFile file, [FromForm] string comment)
@@ -251,7 +251,8 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
         public IActionResult Test_Domain_Bytes()
         {
             var bytes = _testMicroservice.Domain_Bytes();
-            return new FileContentResult(bytes, "application/pdf") { FileDownloadName = "test.pdf" };
+
+            return File(bytes, "application/pdf", "test.pdf");
         }
 
         [HttpGet("api/test/return/domain/test-stream")]
@@ -262,7 +263,7 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
         }
 
         [HttpGet("api/test/return/domain/test-task")]
-        public async Task<IActionResult> Test_Domain_Task()
+        public async Task<IActionResult> Test_Domain_Task() // TEST
         {
             await _testMicroservice.Domain_Task();
             return NoContent();

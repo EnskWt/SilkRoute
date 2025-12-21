@@ -9,7 +9,14 @@ namespace SilkRoute.Tools.RequestTools.RequestParametersBinders
 
         public override void Bind(RequestBuilder requestBuilder, ParameterInfo parameterInfo, object value)
         {
-            requestBuilder.Headers[parameterInfo.Name!] = value.ToString()!;
+            var fromHeader = parameterInfo.GetCustomAttribute<FromHeaderAttribute>(inherit: true);
+
+            var headerName =
+                !string.IsNullOrWhiteSpace(fromHeader?.Name)
+                    ? fromHeader!.Name!
+                    : parameterInfo.Name!;
+
+            requestBuilder.Headers[headerName] = value.ToString()!;
         }
     }
 }

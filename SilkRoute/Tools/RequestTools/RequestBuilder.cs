@@ -169,8 +169,7 @@ namespace SilkRoute.Tools.RequestTools
             }
 
             var uri = UriTemplate!;
-            foreach (var kv in RouteParams)
-                uri = uri.Replace("{" + kv.Key + "}", Uri.EscapeDataString(kv.Value));
+            uri = RouteParameterHelper.ApplyRouteParameters(uri, RouteParams);
 
             if (QueryBuilder.Count() > 0)
                 uri += QueryBuilder.ToQueryString();

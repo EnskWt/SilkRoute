@@ -8,20 +8,24 @@ namespace SilkRoute.Tools.RequestTools.RequestFormWriters
     {
         public int Priority => 0;
         public bool CanWrite(object val) => val is IFormFile;
+
         public void Write(MultipartFormDataContent form, string name, object val)
         {
             var f = (IFormFile)val;
+
             using var ms = new MemoryStream();
             f.CopyTo(ms);
-            ms.Position = 0;
-            var sc = new StreamContent(ms);
-            sc.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-            {
-                Name = $"\"{name}\"",
-                FileName = $"\"{f.FileName}\""
-            };
-            sc.Headers.ContentType = MediaTypeHeaderValue.Parse(f.ContentType);
-            form.Add(sc, name, f.FileName);
+            var bytes = ms.ToArray();
+
+            var content = new ByteArrayContent(bytes);
+
+            var contentType = string.IsNullOrWhiteSpace(f.ContentType)
+                ? "application/octet-stream"
+                : f.ContentType;
+
+            content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
+
+            form.Add(content, name, f.FileName);
         }
     }
 }

@@ -22,7 +22,21 @@ namespace SilkRoute.Tools.ResponseTools.ResponseContentReader
                 (responseType == typeof(IActionResult) || responseType == typeof(ActionResult));
 
             if (payloadType == typeof(byte[]))
+            {
+                if (hasContentDisposition)
+                    return true;
+
+                if (!string.IsNullOrEmpty(mediaType) &&
+                    mediaType.Contains("json", StringComparison.OrdinalIgnoreCase))
+                    return false;
+
+                if (!string.IsNullOrEmpty(mediaType) &&
+                    mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase))
+                    return false;
+
                 return true;
+            }
+                
 
             if (isActionResult &&
                 typeof(FileContentResult).IsAssignableFrom(responseType))

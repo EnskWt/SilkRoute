@@ -42,10 +42,7 @@ namespace SilkRoute.Tools.RequestTools.RequestHelpers
             foreach (var (name, value) in items)
                 AddToForm(multipart, name, value);
 
-            var bytes = multipart.ReadAsByteArrayAsync().GetAwaiter().GetResult();
-            var bc = new ByteArrayContent(bytes);
-            bc.Headers.TryAddWithoutValidation("Content-Type", multipart.Headers.ContentType?.ToString());
-            return bc;
+            return multipart;
         }
 
         internal static void AddToForm(MultipartFormDataContent form, string name, object? val)
