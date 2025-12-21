@@ -10,7 +10,7 @@ namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper
         public bool CanWrap(Type responseType)
             => typeof(FileContentResult).IsAssignableFrom(responseType);
 
-        public IActionResult Wrap(HttpResponseMessage response, Type responseType, object? payload)
+        public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
         {
             if (payload is not byte[] bytes)
                 throw new InvalidOperationException($"FileContentResult requires byte[] payload, got '{payload?.GetType().Name ?? "null"}'.");

@@ -21,23 +21,30 @@ namespace SilkRoute.Tools.ResponseTools.ResponseContentReader
                 !responseType.IsGenericType &&
                 (responseType == typeof(IActionResult) || responseType == typeof(ActionResult));
 
+            bool isGenericActionResult =
+                isActionResult &&
+                responseType.IsGenericType &&
+                responseType.GetGenericTypeDefinition() == typeof(ActionResult<>);
+
+            bool isConcreteActionResult =
+                isActionResult && !isAbstractActionResult && !isGenericActionResult;
+
             if (payloadType == typeof(Stream))
                 return true;
 
-            if (isActionResult &&
-                typeof(FileStreamResult).IsAssignableFrom(responseType))
+            if (isActionResult && typeof(FileStreamResult).IsAssignableFrom(responseType))
                 return true;
 
-            if (isAbstractActionResult)
-            {
-                if (hasContentDisposition)
-                    return true;
+            //if (isActionResult && (isAbstractActionResult || isConcreteActionResult))
+            //{
+            //    if (hasContentDisposition)
+            //        return true;
 
-                if (!string.IsNullOrEmpty(mediaType)
-                    && !mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase)
-                    && !mediaType.Contains("json", StringComparison.OrdinalIgnoreCase))
-                    return true;
-            }
+            //    if (!string.IsNullOrEmpty(mediaType)
+            //        && !mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase)
+            //        && !mediaType.Contains("json", StringComparison.OrdinalIgnoreCase))
+            //        return true;
+            //}
 
             return false;
         }

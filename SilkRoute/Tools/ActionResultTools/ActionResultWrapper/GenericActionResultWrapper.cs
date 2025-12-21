@@ -12,7 +12,7 @@ namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper
             => responseType.IsGenericType
                && responseType.GetGenericTypeDefinition() == typeof(ActionResult<>);
 
-        public IActionResult Wrap(HttpResponseMessage response, Type responseType, object? payload)
+        public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
         {
             var argType = responseType.GetGenericArguments()[0];
 
@@ -31,7 +31,7 @@ namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper
             if (ctor == null)
                 throw new InvalidOperationException($"No suitable ctor for {responseType.Name}({argType.Name}).");
 
-            return (IActionResult)ctor.Invoke(new[] { effectivePayload! });
+            return ctor.Invoke(new[] { effectivePayload! });
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.IO;
+using Microsoft.AspNetCore.Mvc;
 using SilkRoute.Demo.Shared.Contracts;
 using SilkRoute.Demo.Shared.Models;
 
@@ -252,7 +253,7 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
         {
             var bytes = _testMicroservice.Domain_Bytes();
 
-            return File(bytes, "application/pdf", "test.pdf");
+            return new FileContentResult(bytes, "application/pdf") { FileDownloadName = "test.pdf" };
         }
 
         [HttpGet("api/test/return/domain/test-stream")]
@@ -263,7 +264,7 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
         }
 
         [HttpGet("api/test/return/domain/test-task")]
-        public async Task<IActionResult> Test_Domain_Task() // TEST
+        public async Task<IActionResult> Test_Domain_Task()
         {
             await _testMicroservice.Domain_Task();
             return NoContent();
@@ -312,12 +313,22 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
             => _testMicroservice.ActionResultT_String();
 
         [HttpGet("api/test/return/actionresultt/test-bytes")]
-        public ActionResult<byte[]> Test_ActionResultT_Bytes()
-            => _testMicroservice.ActionResultT_Bytes();
+        public IActionResult Test_ActionResultT_Bytes()
+        {
+            var result = _testMicroservice.ActionResultT_Bytes();
+            var bytes = result.Value!;
+
+            return new FileContentResult(bytes, "application/pdf") { FileDownloadName = "test.pdf" };
+        }
 
         [HttpGet("api/test/return/actionresultt/test-stream")]
         public ActionResult<Stream> Test_ActionResultT_Stream()
-            => _testMicroservice.ActionResultT_Stream();
+        {
+            var result = _testMicroservice.ActionResultT_Stream();
+            var stream = result.Value!;
+
+            return new FileStreamResult(stream, "application/pdf") { FileDownloadName = "test.pdf" };
+        }
 
         #endregion
 
@@ -328,6 +339,7 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
             => _testMicroservice.ContentResult_String();
 
         [HttpGet("api/test/return/concrete-actionresult/test-objectresult-complexdto")]
+        [Produces("application/json")]
         public ObjectResult Test_ObjectResult_ComplexDto()
             => _testMicroservice.ObjectResult_ComplexDto();
 
@@ -348,6 +360,7 @@ namespace SilkRoute.Demo.ClientMicroservice.Controllers
         #region Abstract and not explicitly supported ActionResults return types
 
         [HttpGet("api/test/return/abstract-and-default-actionresult/test-iactionresult-objectresult-complexdto")]
+        [Produces("application/json")]
         public IActionResult Test_IActionResult_ObjectResult_ComplexDto()
             => _testMicroservice.IActionResult_ObjectResult_ComplexDto();
 

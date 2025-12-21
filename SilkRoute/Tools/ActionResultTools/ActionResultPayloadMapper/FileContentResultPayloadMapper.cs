@@ -9,7 +9,7 @@ namespace SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper
 
         public bool CanMap(HttpResponseMessage response, object? payload) => payload is byte[];
 
-        public IActionResult Map(HttpResponseMessage response, object? payload)
+        public object Map(HttpResponseMessage response, object? payload)
         {
             var bytes = (byte[])payload!;
             var contentType = response.Content?.Headers.ContentType?.ToString() ?? "application/octet-stream";

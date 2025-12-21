@@ -6,13 +6,13 @@ using SilkRoute.Tools.ActionResultTools.ActionResultWrapper.WrapperContract;
 
 namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper
 {
-    internal sealed class DefaultActionResultWrapper : IActionResultWrapper
+    internal sealed class AbstractActionResultWrapper : IActionResultWrapper
     {
         public int Priority => int.MaxValue;
 
         private readonly List<IActionResultPayloadMapper> _mappers;
 
-        public DefaultActionResultWrapper()
+        public AbstractActionResultWrapper()
         {
             _mappers = new IActionResultPayloadMapper[]
             {
@@ -28,25 +28,20 @@ namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper
 
         public bool CanWrap(Type responseType)
         {
-            if (responseType == typeof(IActionResult) || responseType == typeof(ActionResult))
-                return true;
-
-            return typeof(IActionResult).IsAssignableFrom(responseType)
-                   || typeof(IConvertToActionResult).IsAssignableFrom(responseType);
+            return responseType == typeof(IActionResult) || responseType == typeof(ActionResult);
         }
 
-        public IActionResult Wrap(HttpResponseMessage response, Type responseType, object? payload)
+        public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
         {
             var mapper = _mappers.FirstOrDefault(m => m.CanMap(response, payload));
             if (mapper != null)
                 return mapper.Map(response, payload);
 
-            return new ContentResult
-            {
-                Content = payload?.ToString(),
-                ContentType = response.Content?.Headers.ContentType?.ToString() ?? "text/plain",
-                StatusCode = (int)response.StatusCode
-            };
+            throw new NotSupportedException(
+            $"No payload mapper matched for abstract action result. " +
+            $"Status={(int)response.StatusCode} ({response.StatusCode}), " +
+            $"ContentType={response.Content?.Headers.ContentType?.ToString() ?? "<null>"}, " +
+            $"HasContentDisposition={(response.Content?.Headers.ContentDisposition != null)}");
         }
     }
 }

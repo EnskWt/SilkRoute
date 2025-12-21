@@ -9,7 +9,7 @@ namespace SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper
 
         public bool CanMap(HttpResponseMessage response, object? payload) => payload is not null;
 
-        public IActionResult Map(HttpResponseMessage response, object? payload)
+        public object Map(HttpResponseMessage response, object? payload)
         {
             var statusCode = (int)response.StatusCode;
             var contentType = response.Content?.Headers.ContentType?.ToString();

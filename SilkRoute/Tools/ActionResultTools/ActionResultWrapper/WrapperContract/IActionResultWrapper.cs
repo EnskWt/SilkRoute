@@ -8,7 +8,7 @@ namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper.WrapperContract
 
         bool CanWrap(Type responseType);
 
-        IActionResult Wrap(
+        object Wrap(
             HttpResponseMessage response,
             Type responseType,
             object? payload);

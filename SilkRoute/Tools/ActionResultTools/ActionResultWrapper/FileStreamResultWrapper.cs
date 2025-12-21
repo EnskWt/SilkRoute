@@ -10,7 +10,7 @@ namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper
         public bool CanWrap(Type responseType)
             => typeof(FileStreamResult).IsAssignableFrom(responseType);
 
-        public IActionResult Wrap(HttpResponseMessage response, Type responseType, object? payload)
+        public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
         {
             if (payload is not Stream stream)
                 throw new InvalidOperationException($"FileStreamResult requires Stream payload, got '{payload?.GetType().Name ?? "null"}'.");

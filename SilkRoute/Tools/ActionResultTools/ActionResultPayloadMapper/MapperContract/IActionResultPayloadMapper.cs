@@ -6,6 +6,6 @@ namespace SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper.Contract
     {
         int Priority { get; }
         bool CanMap(HttpResponseMessage response, object? payload);
-        IActionResult Map(HttpResponseMessage response, object? payload);
+        object Map(HttpResponseMessage response, object? payload);
     }
 }

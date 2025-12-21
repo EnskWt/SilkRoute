@@ -17,13 +17,14 @@ namespace SilkRoute.Tools.ActionResultTools
                 new FileStreamResultWrapper(),
                 new FileContentResultWrapper(),
                 new StatusCodeResultWrapper(),
-                new DefaultActionResultWrapper()
+                new ContentResultWrapper(),
+                new AbstractActionResultWrapper()
             }
             .OrderBy(w => w.Priority)
             .ToList();
         }
 
-        public IActionResult Wrap(HttpResponseMessage response, Type responseType, object? payload)
+        public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
         {
             foreach (var wrapper in _actionResultWrappers)
             {
@@ -31,12 +32,10 @@ namespace SilkRoute.Tools.ActionResultTools
                     return wrapper.Wrap(response, responseType, payload);
             }
 
-            return new ContentResult
-            {
-                Content = payload?.ToString(),
-                ContentType = response.Content?.Headers.ContentType?.ToString() ?? "text/plain",
-                StatusCode = (int)response.StatusCode
-            };
+            throw new NotSupportedException(
+                $"No ActionResult wrapper registered for '{responseType.FullName}'. " +
+                $"Status={(int)response.StatusCode} ({response.StatusCode}), " +
+                $"ContentType={response.Content?.Headers.ContentType?.ToString() ?? "<null>"}.");
         }
     }
 }

@@ -20,22 +20,33 @@ namespace SilkRoute.Tools.ResponseTools.ResponseContentReader
                 !responseType.IsGenericType &&
                 (responseType == typeof(IActionResult) || responseType == typeof(ActionResult));
 
+            bool isGenericActionResult =
+                isActionResult &&
+                responseType.IsGenericType &&
+                responseType.GetGenericTypeDefinition() == typeof(ActionResult<>);
+
+            bool isConcreteActionResult =
+                isActionResult && !isAbstractActionResult && !isGenericActionResult;
+
             if (payloadType == typeof(string))
                 return true;
 
-            if (isAbstractActionResult && !string.IsNullOrEmpty(mediaType))
+            if (isActionResult && typeof(ContentResult).IsAssignableFrom(responseType))
+                return true;
+
+            if (isActionResult && (isAbstractActionResult || isConcreteActionResult) && !string.IsNullOrEmpty(mediaType))
             {
                 if (mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase))
                     return true;
 
-                if (mediaType.Contains("json", StringComparison.OrdinalIgnoreCase)
-                    || mediaType.Contains("xml", StringComparison.OrdinalIgnoreCase)
+                if (mediaType.Contains("xml", StringComparison.OrdinalIgnoreCase)
                     || mediaType.Contains("html", StringComparison.OrdinalIgnoreCase))
                     return true;
             }
 
             return false;
         }
+
 
         public async Task<object?> ReadAsync(
             HttpResponseMessage response,

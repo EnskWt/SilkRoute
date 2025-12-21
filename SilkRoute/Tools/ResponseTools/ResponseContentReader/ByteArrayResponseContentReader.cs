@@ -21,6 +21,14 @@ namespace SilkRoute.Tools.ResponseTools.ResponseContentReader
                 !responseType.IsGenericType &&
                 (responseType == typeof(IActionResult) || responseType == typeof(ActionResult));
 
+            bool isGenericActionResult =
+                isActionResult &&
+                responseType.IsGenericType &&
+                responseType.GetGenericTypeDefinition() == typeof(ActionResult<>);
+
+            bool isConcreteActionResult =
+                isActionResult && !isAbstractActionResult && !isGenericActionResult;
+
             if (payloadType == typeof(byte[]))
             {
                 if (hasContentDisposition)
@@ -36,13 +44,11 @@ namespace SilkRoute.Tools.ResponseTools.ResponseContentReader
 
                 return true;
             }
-                
 
-            if (isActionResult &&
-                typeof(FileContentResult).IsAssignableFrom(responseType))
+            if (isActionResult && typeof(FileContentResult).IsAssignableFrom(responseType))
                 return true;
 
-            if (isAbstractActionResult)
+            if (isActionResult && (isAbstractActionResult || isConcreteActionResult))
             {
                 if (hasContentDisposition)
                     return true;

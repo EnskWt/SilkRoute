@@ -10,7 +10,7 @@ namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper
         public bool CanWrap(Type responseType)
             => typeof(StatusCodeResult).IsAssignableFrom(responseType);
 
-        public IActionResult Wrap(HttpResponseMessage response, Type responseType, object? payload)
+        public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
         {
             var statusCode = (int)response.StatusCode;
 
