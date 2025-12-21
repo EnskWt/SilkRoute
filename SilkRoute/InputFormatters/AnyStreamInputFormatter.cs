@@ -7,15 +7,10 @@ namespace SilkRoute.InputFormatters
     {
         public AnyStreamOrBytesInputFormatter()
         {
-            // Для "raw body" сценаріїв. Multipart сюди не пхаємо (це не raw stream).
             SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/octet-stream"));
             SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/pdf"));
             SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/zip"));
             SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("text/plain"));
-
-            // Якщо хочеш "все підряд" типу image/* - краще робити це в CanRead
-            // через StartsWith("image/"), бо MediaTypeHeaderValue.Parse("image/*")
-            // може бути не тим, що ти думаєш у різних версіях.
         }
 
         protected override bool CanReadType(Type type)
@@ -28,7 +23,7 @@ namespace SilkRoute.InputFormatters
 
             var ct = context.HttpContext.Request.ContentType;
 
-            // Дозволяємо також image/* video/* audio/* "по-людськи"
+            
             if (!string.IsNullOrWhiteSpace(ct))
             {
                 if (ct.StartsWith("image/", StringComparison.OrdinalIgnoreCase)) return true;
@@ -36,7 +31,7 @@ namespace SilkRoute.InputFormatters
                 if (ct.StartsWith("audio/", StringComparison.OrdinalIgnoreCase)) return true;
             }
 
-            return true; // base.CanRead вже перевірив SupportedMediaTypes (якщо ContentType заданий)
+            return true; 
         }
 
         public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)
@@ -53,8 +48,7 @@ namespace SilkRoute.InputFormatters
 
             if (context.ModelType == typeof(Stream))
             {
-                // Важливо: Request.Body НЕ seekable -> Position може кидати NotSupportedException.
-                // Якщо тобі потрібен seekable стрім (щоб можна було Position=0) – буферизуємо.
+                
                 var ms = new MemoryStream();
                 await request.Body.CopyToAsync(ms, abort);
                 ms.Position = 0;
