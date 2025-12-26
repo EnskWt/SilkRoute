@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper.Contract
+namespace SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper.Contract;
+
+internal interface IActionResultPayloadMapper
 {
-    internal interface IActionResultPayloadMapper
-    {
-        int Priority { get; }
-        bool CanMap(HttpResponseMessage response, object? payload);
-        object Map(HttpResponseMessage response, object? payload);
-    }
+    int Priority { get; }
+    bool CanMap(HttpResponseMessage response, object? payload);
+    object Map(HttpResponseMessage response, object? payload);
 }

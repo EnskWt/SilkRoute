@@ -1,24 +1,17 @@
 ﻿using Castle.DynamicProxy;
-using SilkRoute.Interfaces;
+using SilkRoute.Abstractions.External;
 
-namespace SilkRoute.Proxy
+namespace SilkRoute.Proxy;
+
+internal static class MicroserviceProxyFactory
 {
-    /// <summary>
-    /// Factory to create proxy instances.
-    /// </summary>
-    internal static class MicroserviceProxyFactory<T>
+    private static readonly ProxyGenerator Generator = new();
+
+    public static T Create<T>(HttpClient httpClient)
         where T : class, IMicroserviceClient
     {
-        private static readonly ProxyGenerator _generator = new ProxyGenerator();
-
-        public static T Create(HttpClient httpClient)
-        {
-            var microserviceProxy = new MicroserviceProxy<T>(httpClient);
-
-            var interceptor = microserviceProxy.ToInterceptor();
-
-            var proxy = _generator.CreateInterfaceProxyWithoutTarget<T>(interceptor);
-            return proxy;
-        }
+        var microserviceProxy = new MicroserviceProxy<T>(httpClient);
+        var interceptor = microserviceProxy.ToInterceptor();
+        return Generator.CreateInterfaceProxyWithoutTarget<T>(interceptor);
     }
 }

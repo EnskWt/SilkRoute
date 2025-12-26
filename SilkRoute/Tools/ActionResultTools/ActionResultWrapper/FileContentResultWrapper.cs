@@ -1,32 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SilkRoute.Tools.ActionResultTools.ActionResultWrapper.WrapperContract;
 
-namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper
+namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper;
+
+internal sealed class FileContentResultWrapper : IActionResultWrapper
 {
-    internal sealed class FileContentResultWrapper : IActionResultWrapper
+    public int Priority => 30;
+
+    public bool CanWrap(Type responseType)
+        => typeof(FileContentResult).IsAssignableFrom(responseType);
+
+    public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
     {
-        public int Priority => 30;
+        if (payload is not byte[] bytes)
+            throw new InvalidOperationException($"FileContentResult requires byte[] payload, got '{payload?.GetType().Name ?? "null"}'.");
 
-        public bool CanWrap(Type responseType)
-            => typeof(FileContentResult).IsAssignableFrom(responseType);
+        var contentType = response.Content?.Headers.ContentType?.ToString() ?? "application/octet-stream";
 
-        public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
-        {
-            if (payload is not byte[] bytes)
-                throw new InvalidOperationException($"FileContentResult requires byte[] payload, got '{payload?.GetType().Name ?? "null"}'.");
+        var result = new FileContentResult(bytes, contentType);
 
-            var contentType = response.Content?.Headers.ContentType?.ToString() ?? "application/octet-stream";
+        var fileName =
+            response.Content?.Headers.ContentDisposition?.FileNameStar ??
+            response.Content?.Headers.ContentDisposition?.FileName;
 
-            var result = new FileContentResult(bytes, contentType);
+        if (!string.IsNullOrWhiteSpace(fileName))
+            result.FileDownloadName = fileName;
 
-            var fileName =
-                response.Content?.Headers.ContentDisposition?.FileNameStar ??
-                response.Content?.Headers.ContentDisposition?.FileName;
-
-            if (!string.IsNullOrWhiteSpace(fileName))
-                result.FileDownloadName = fileName;
-
-            return result;
-        }
+        return result;
     }
 }

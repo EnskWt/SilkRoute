@@ -1,9 +1,8 @@
-﻿namespace SilkRoute.Tools.RequestTools.RequestBodyFactory.FactoryContract
+﻿namespace SilkRoute.Tools.RequestTools.RequestBodyFactory.FactoryContract;
+
+internal interface IRequestBodyFactory
 {
-    internal interface IRequestBodyFactory
-    {
-        int Priority { get; }
-        bool CanCreate(object val);
-        HttpContent Create(object val);
-    }
+    int Priority { get; }
+    bool CanCreate(object val);
+    HttpContent Create(object val);
 }

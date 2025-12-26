@@ -6,27 +6,26 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SilkRoute.Tools.ActionResultTools.ActionResultWrapper.WrapperContract;
 
-namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper
+namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper;
+
+internal sealed class ContentResultWrapper : IActionResultWrapper
 {
-    internal sealed class ContentResultWrapper : IActionResultWrapper
+    public int Priority => 50;
+
+    public bool CanWrap(Type responseType)
+        => typeof(ContentResult).IsAssignableFrom(responseType);
+
+    public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
     {
-        public int Priority => 50;
+        var statusCode = (int)response.StatusCode;
 
-        public bool CanWrap(Type responseType)
-            => typeof(ContentResult).IsAssignableFrom(responseType);
+        var contentType = response.Content?.Headers.ContentType?.ToString();
 
-        public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
+        return new ContentResult
         {
-            var statusCode = (int)response.StatusCode;
-
-            var contentType = response.Content?.Headers.ContentType?.ToString();
-
-            return new ContentResult
-            {
-                StatusCode = statusCode,
-                ContentType = contentType,       
-                Content = payload?.ToString()  
-            };
-        }
+            StatusCode = statusCode,
+            ContentType = contentType,       
+            Content = payload?.ToString()  
+        };
     }
 }

@@ -1,20 +1,19 @@
-﻿namespace SilkRoute.Tools.ResponseTools.ResponseContentReader.ReaderContract
+﻿namespace SilkRoute.Tools.ResponseTools.ResponseContentReader.ReaderContract;
+
+internal interface IResponseContentReader
 {
-    internal interface IResponseContentReader
-    {
-        int Priority { get; }
+    int Priority { get; }
 
-        bool CanRead(
-            Type responseType,
-            Type payloadType,
-            bool isActionResult,
-            HttpResponseMessage response);
+    bool CanRead(
+        Type responseType,
+        Type payloadType,
+        bool isActionResult,
+        HttpResponseMessage response);
 
-        Task<object?> ReadAsync(
-            HttpResponseMessage response,
-            Type responseType,
-            Type payloadType,
-            bool isActionResult,
-            CancellationToken cancellationToken = default);
-    }
+    Task<object?> ReadAsync(
+        HttpResponseMessage response,
+        Type responseType,
+        Type payloadType,
+        bool isActionResult,
+        CancellationToken cancellationToken = default);
 }

@@ -1,22 +1,21 @@
 ﻿using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SilkRoute.Tools.RequestTools.RequestParametersBinders
+namespace SilkRoute.Tools.RequestTools.RequestParametersBinders;
+
+internal class HeaderParametersBinder : AttributeParametersBinder<FromHeaderAttribute>
 {
-    internal class HeaderParametersBinder : AttributeParametersBinder<FromHeaderAttribute>
+    public override int Priority { get; } = 1;
+
+    public override void Bind(RequestBuilder requestBuilder, ParameterInfo parameterInfo, object value)
     {
-        public override int Priority { get; } = 1;
+        var fromHeader = parameterInfo.GetCustomAttribute<FromHeaderAttribute>(inherit: true);
 
-        public override void Bind(RequestBuilder requestBuilder, ParameterInfo parameterInfo, object value)
-        {
-            var fromHeader = parameterInfo.GetCustomAttribute<FromHeaderAttribute>(inherit: true);
+        var headerName =
+            !string.IsNullOrWhiteSpace(fromHeader?.Name)
+                ? fromHeader!.Name!
+                : parameterInfo.Name!;
 
-            var headerName =
-                !string.IsNullOrWhiteSpace(fromHeader?.Name)
-                    ? fromHeader!.Name!
-                    : parameterInfo.Name!;
-
-            requestBuilder.Headers[headerName] = value.ToString()!;
-        }
+        requestBuilder.Headers[headerName] = value.ToString()!;
     }
 }

@@ -1,7 +1,6 @@
-﻿namespace SilkRoute.Settings
+﻿namespace SilkRoute.Settings;
+
+public class MicroserviceClientSettings
 {
-    public class MicroserviceClientSettings
-    {
-        public Action<HttpClient>? HttpClientConfiguration { get; set; }
-    }
+    public Action<HttpClient>? HttpClientConfiguration { get; set; }
 }

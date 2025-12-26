@@ -1,62 +1,61 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SilkRoute.Tools.ResponseTools.ResponseContentReader.ReaderContract;
 
-namespace SilkRoute.Tools.ResponseTools.ResponseContentReader
+namespace SilkRoute.Tools.ResponseTools.ResponseContentReader;
+
+internal sealed class StringResponseContentReader : IResponseContentReader
 {
-    internal sealed class StringResponseContentReader : IResponseContentReader
+    public int Priority => 30;
+
+    public bool CanRead(
+        Type responseType,
+        Type payloadType,
+        bool isActionResult,
+        HttpResponseMessage response)
     {
-        public int Priority => 30;
+        var mediaType = response.Content?.Headers.ContentType?.MediaType;
 
-        public bool CanRead(
-            Type responseType,
-            Type payloadType,
-            bool isActionResult,
-            HttpResponseMessage response)
+        var isAbstractActionResult =
+            isActionResult &&
+            !responseType.IsGenericType &&
+            (responseType == typeof(IActionResult) || responseType == typeof(ActionResult));
+
+        var isGenericActionResult =
+            isActionResult &&
+            responseType.IsGenericType &&
+            responseType.GetGenericTypeDefinition() == typeof(ActionResult<>);
+
+        var isConcreteActionResult =
+            isActionResult && !isAbstractActionResult && !isGenericActionResult;
+
+        if (payloadType == typeof(string))
+            return true;
+
+        if (isActionResult && typeof(ContentResult).IsAssignableFrom(responseType))
+            return true;
+
+        if (isActionResult && (isAbstractActionResult || isConcreteActionResult) && !string.IsNullOrEmpty(mediaType))
         {
-            var mediaType = response.Content?.Headers.ContentType?.MediaType;
-
-            bool isAbstractActionResult =
-                isActionResult &&
-                !responseType.IsGenericType &&
-                (responseType == typeof(IActionResult) || responseType == typeof(ActionResult));
-
-            bool isGenericActionResult =
-                isActionResult &&
-                responseType.IsGenericType &&
-                responseType.GetGenericTypeDefinition() == typeof(ActionResult<>);
-
-            bool isConcreteActionResult =
-                isActionResult && !isAbstractActionResult && !isGenericActionResult;
-
-            if (payloadType == typeof(string))
+            if (mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (isActionResult && typeof(ContentResult).IsAssignableFrom(responseType))
+            if (mediaType.Contains("xml", StringComparison.OrdinalIgnoreCase)
+                || mediaType.Contains("html", StringComparison.OrdinalIgnoreCase))
                 return true;
-
-            if (isActionResult && (isAbstractActionResult || isConcreteActionResult) && !string.IsNullOrEmpty(mediaType))
-            {
-                if (mediaType.StartsWith("text/", StringComparison.OrdinalIgnoreCase))
-                    return true;
-
-                if (mediaType.Contains("xml", StringComparison.OrdinalIgnoreCase)
-                    || mediaType.Contains("html", StringComparison.OrdinalIgnoreCase))
-                    return true;
-            }
-
-            return false;
         }
 
+        return false;
+    }
 
-        public async Task<object?> ReadAsync(
-            HttpResponseMessage response,
-            Type responseType,
-            Type payloadType,
-            bool isActionResult,
-            CancellationToken cancellationToken = default)
-        {
-            return await response.Content.ReadAsStringAsync(cancellationToken)
-                .ConfigureAwait(false);
-        }
+
+    public async Task<object?> ReadAsync(
+        HttpResponseMessage response,
+        Type responseType,
+        Type payloadType,
+        bool isActionResult,
+        CancellationToken cancellationToken = default)
+    {
+        return await response.Content.ReadAsStringAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 }
