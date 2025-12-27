@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SilkRoute.Abstractions.External;
+using SilkRoute.Abstractions;
 using SilkRoute.Proxy;
 using SilkRoute.Settings;
 

@@ -8,6 +8,7 @@ using SilkRoute.Tools.RequestTools.RequestParametersBinders.BinderContract;
 
 namespace SilkRoute.Tools.RequestTools;
 
+// TODO: передавати параметри в конструктор
 internal class RequestBuilder
 {
     public HttpMethod? Method { get; }

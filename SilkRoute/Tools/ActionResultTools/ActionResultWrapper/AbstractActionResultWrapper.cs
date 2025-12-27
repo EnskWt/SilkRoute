@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper;
-using SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper.Contract;
+using SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper.MapperContract;
 using SilkRoute.Tools.ActionResultTools.ActionResultWrapper.WrapperContract;
 
 namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper;

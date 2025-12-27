@@ -1,4 +1,4 @@
-﻿namespace SilkRoute.Abstractions.External;
+﻿namespace SilkRoute.Abstractions;
 
 /// <summary>
 /// Marker interface for microservice clients.

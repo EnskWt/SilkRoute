@@ -1,5 +1,5 @@
 ﻿using Castle.DynamicProxy;
-using SilkRoute.Abstractions.External;
+using SilkRoute.Abstractions;
 
 namespace SilkRoute.Proxy;
 

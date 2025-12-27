@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper.Contract;
+using SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper.MapperContract;
 
 namespace SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper;
 

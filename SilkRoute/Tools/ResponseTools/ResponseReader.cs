@@ -1,14 +1,22 @@
-﻿using SilkRoute.Tools.ResponseTools.ResponseContentReader;
+﻿using SilkRoute.Tools.ActionReturnTools.ActionReturnDescriptors.ActionReturnDescriptorContract;
+using SilkRoute.Tools.ResponseTools.ResponseContentReader;
 using SilkRoute.Tools.ResponseTools.ResponseContentReader.ReaderContract;
 
 namespace SilkRoute.Tools.ResponseTools;
 
 internal sealed class ResponseReader
 {
-    private readonly List<IResponseContentReader> _contentReaders;
+    private readonly HttpResponseMessage _response;
+    private readonly IActionReturnDescriptor _actionReturnDescriptor;
+    private readonly IReadOnlyList<IResponseContentReader> _contentReaders;
 
-    public ResponseReader()
+    public ResponseReader(
+        HttpResponseMessage response,
+        IActionReturnDescriptor actionReturnDescriptor)
     {
+        _response = response ?? throw new ArgumentNullException(nameof(response));
+        _actionReturnDescriptor = actionReturnDescriptor ?? throw new ArgumentNullException(nameof(actionReturnDescriptor));
+        
         _contentReaders = new List<IResponseContentReader>
             {
                 new VoidResponseContentReader(),
@@ -21,18 +29,13 @@ internal sealed class ResponseReader
             .ToList();
     }
 
-    public async Task<object?> ReadResponseContent(
-        HttpResponseMessage response,
-        Type responseType,
-        Type payloadType,
-        bool isActionResult,
-        CancellationToken cancellationToken = default)
+    public async Task<object?> ReadResponseContent()
     {
         foreach (var reader in _contentReaders)
         {
-            if (reader.CanRead(responseType, payloadType, isActionResult, response))
+            if (reader.CanRead(_response, _actionReturnDescriptor))
             {
-                return await reader.ReadAsync(response, responseType, payloadType, isActionResult, cancellationToken)
+                return await reader.ReadAsync(_response, _actionReturnDescriptor)
                     .ConfigureAwait(false);
             }
         }

@@ -4,11 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
-using SilkRoute.Abstractions.External;
-using SilkRoute.Abstractions.Internal;
+using SilkRoute.Abstractions;
 using SilkRoute.Tools.ActionResultTools;
-using SilkRoute.Tools.MethodResultTools.MethodResultDescriptors.MethodResultDescriptorFactory;
-using SilkRoute.Tools.MvcTools.Extensions;
+using SilkRoute.Tools.ActionReturnTools.ActionReturnDescriptors.ActionReturnDescriptorContract;
+using SilkRoute.Tools.ActionReturnTools.ActionReturnDescriptors.ActionReturnDescriptorFactory;
 using SilkRoute.Tools.RequestTools;
 using SilkRoute.Tools.ResponseTools;
 
@@ -77,9 +76,9 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
         var response = await SendRequest(method, uri, content, headers)
             .ConfigureAwait(false);
 
-        var methodResultDescriptor = GetMethodResultDescriptor(targetMethod);
+        var actionReturnDescriptor = GetActionReturnDescriptor(targetMethod);
 
-        var payload = await ReadResponse(response, responseType, payloadType, isActionResult)
+        var actionReturnValue = await ReadResponse(response, actionReturnDescriptor)
             .ConfigureAwait(false);
 
         var result = BuildResult(response, responseType, isActionResult, payload);
@@ -157,20 +156,13 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
     
     private Task<object?> ReadResponse(
         HttpResponseMessage response,
-        Type responseType,
-        Type payloadType,
-        bool isActionResult)
+        IActionReturnDescriptor actionReturnDescriptor)
     {
-        var responseReader = new ResponseReader();
-
-        return responseReader.ReadResponseContent(
-            response,
-            responseType,
-            payloadType,
-            isActionResult);
+        var responseReader = new ResponseReader(response, actionReturnDescriptor);
+        return responseReader.ReadResponseContent();
     }
     
-    private static IMethodResultDescriptor GetMethodResultDescriptor(MethodInfo targetMethod)
+    private static IActionReturnDescriptor GetActionReturnDescriptor(MethodInfo targetMethod)
     {
         if (targetMethod == null)
         {
@@ -185,7 +177,7 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
             ? (returnType.IsGenericType ? returnType.GetGenericArguments()[0] : typeof(void))
             : returnType;
 
-        return MethodResultDescriptorFactory.Create(resultType);
+        return ActionReturnDescriptorFactory.Create(resultType);
     }
     
     private object BuildResult(

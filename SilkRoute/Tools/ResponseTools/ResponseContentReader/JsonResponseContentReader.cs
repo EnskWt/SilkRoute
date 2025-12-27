@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using SilkRoute.Tools.ActionResultTools.ActionResultExtensions;
+using SilkRoute.Tools.ActionReturnTools.ActionReturnDescriptors.ActionReturnDescriptorContract;
 using SilkRoute.Tools.ResponseTools.ResponseContentReader.ReaderContract;
+using SilkRoute.Tools.ResponseTools.ResponseExtensions;
 
 namespace SilkRoute.Tools.ResponseTools.ResponseContentReader;
 
@@ -11,62 +14,58 @@ internal sealed class JsonResponseContentReader : IResponseContentReader
 {
     public int Priority => int.MaxValue;
 
-    public bool CanRead(
-        Type responseType,
-        Type payloadType,
-        bool isActionResult,
-        HttpResponseMessage response)
+    public bool CanRead(HttpResponseMessage responseMessage, IActionReturnDescriptor descriptor)
     {
-        var mediaType = response.Content?.Headers.ContentType?.MediaType;
-
-        var isAbstractActionResult =
-            isActionResult &&
-            !responseType.IsGenericType &&
-            (responseType == typeof(IActionResult) || responseType == typeof(ActionResult));
-
-        var isGenericActionResult =
-            isActionResult &&
-            responseType.IsGenericType &&
-            responseType.GetGenericTypeDefinition() == typeof(ActionResult<>);
-
-        if (!isActionResult)
+        if (descriptor.ActionReturnTypeMatchesJson())
+        {
             return true;
+        }
 
-        if (isGenericActionResult)
-            return true;
-
-        if (typeof(ObjectResult).IsAssignableFrom(responseType))
-            return true;
-
-        if (!string.IsNullOrEmpty(mediaType) &&
-            mediaType.Contains("json", StringComparison.OrdinalIgnoreCase))
-            return true;
+        if (descriptor.GetActionReturnType().IsAbstractActionResultType())
+        {
+            if (responseMessage.IsJsonMediaType())
+            {
+                return true;
+            }
+        }
 
         return false;
     }
 
     public async Task<object?> ReadAsync(
         HttpResponseMessage response,
-        Type responseType,
-        Type payloadType,
-        bool isActionResult,
-        CancellationToken cancellationToken = default)
+        IActionReturnDescriptor descriptor)
     {
-        var json = await response.Content.ReadAsStringAsync(cancellationToken)
+        var json = await response.Content.ReadAsStringAsync()
             .ConfigureAwait(false);
 
         if (string.IsNullOrWhiteSpace(json))
+        {
             return null;
+        }
 
-        var targetType =
-            isActionResult && (typeof(IActionResult).IsAssignableFrom(payloadType)
-                               || typeof(IConvertToActionResult).IsAssignableFrom(payloadType))
-                ? typeof(ExpandoObject)
-                : payloadType;
+        var actionReturnType = descriptor.GetActionReturnType();
 
-        var settings = targetType == typeof(ExpandoObject)
-            ? new JsonSerializerSettings { Converters = { new ExpandoObjectConverter() } }
-            : null;
+        var targetType = actionReturnType;
+        
+        if (actionReturnType.IsGenericActionResultType())
+        {
+            targetType = actionReturnType.GetGenericActionResultValueType();
+        }
+
+        if (actionReturnType.IsAbstractActionResultType() || actionReturnType.IsConcreteActionResultType())
+        {
+            targetType = typeof(ExpandoObject);
+        }
+
+        JsonSerializerSettings? settings = null;
+        if (targetType == typeof(ExpandoObject))
+        {
+            settings = new JsonSerializerSettings
+            {
+                Converters = { new ExpandoObjectConverter() }
+            };
+        }
 
         return settings == null
             ? JsonConvert.DeserializeObject(json, targetType)

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper.Contract;
+﻿namespace SilkRoute.Tools.ActionResultTools.ActionResultPayloadMapper.MapperContract;
 
 internal interface IActionResultPayloadMapper
 {
