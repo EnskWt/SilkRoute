@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using SilkRoute.Abstractions;
 using SilkRoute.Tools.ActionResultTools;
+using SilkRoute.Tools.ActionResultTools.ActionResultExtensions;
 using SilkRoute.Tools.ActionReturnTools.ActionReturnDescriptors.ActionReturnDescriptorContract;
 using SilkRoute.Tools.ActionReturnTools.ActionReturnDescriptors.ActionReturnDescriptorFactory;
 using SilkRoute.Tools.RequestTools;
@@ -81,7 +82,7 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
         var actionReturnValue = await ReadResponse(response, actionReturnDescriptor)
             .ConfigureAwait(false);
 
-        var result = BuildResult(response, responseType, isActionResult, payload);
+        var result = BuildActionResultIfNeeded(response, actionReturnDescriptor, actionReturnValue);
 
         return result;
     }
@@ -154,14 +155,6 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
             .ConfigureAwait(false);
     }
     
-    private Task<object?> ReadResponse(
-        HttpResponseMessage response,
-        IActionReturnDescriptor actionReturnDescriptor)
-    {
-        var responseReader = new ResponseReader(response, actionReturnDescriptor);
-        return responseReader.ReadResponseContent();
-    }
-    
     private static IActionReturnDescriptor GetActionReturnDescriptor(MethodInfo targetMethod)
     {
         if (targetMethod == null)
@@ -180,17 +173,29 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
         return ActionReturnDescriptorFactory.Create(resultType);
     }
     
-    private object BuildResult(
+    private Task<object?> ReadResponse(
         HttpResponseMessage response,
-        Type responseType,
-        bool isActionResult,
-        object? payload)
+        IActionReturnDescriptor actionReturnDescriptor)
     {
-        if (!isActionResult)
-            return payload!;
+        var responseReader = new ResponseReader(response, actionReturnDescriptor);
+        return responseReader.ReadResponseContent();
+    }
+    
+    private object BuildActionResultIfNeeded(
+        HttpResponseMessage response,
+        IActionReturnDescriptor actionReturnDescriptor,
+        object? actionReturnValue)
+    {
+        var actionReturnType = actionReturnDescriptor.GetActionReturnType();
 
-        var actionResultWrapperFactory = new ActionResultWrapperFactory();
+        if (!actionReturnType.IsActionResultLikeType())
+        {
+            return actionReturnValue!;
+        }
 
-        return actionResultWrapperFactory.Wrap(response, responseType, payload);
+        var actionResultWrapperFactory =
+            new ActionResultWrapperFactory(response, actionReturnDescriptor, actionReturnValue);
+
+        return actionResultWrapperFactory.Wrap();
     }
 }

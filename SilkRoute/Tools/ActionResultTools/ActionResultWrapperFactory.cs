@@ -1,19 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SilkRoute.Tools.ActionResultTools.ActionResultWrapper;
 using SilkRoute.Tools.ActionResultTools.ActionResultWrapper.WrapperContract;
+using SilkRoute.Tools.ActionReturnTools.ActionReturnDescriptors.ActionReturnDescriptorContract;
 
 namespace SilkRoute.Tools.ActionResultTools;
 
 internal sealed class ActionResultWrapperFactory
 {
+    private readonly HttpResponseMessage _response;
+    private readonly IActionReturnDescriptor _actionReturnDescriptor;
+    private readonly object? _actionReturnValue;
     private readonly List<IActionResultWrapper> _actionResultWrappers;
 
-    public ActionResultWrapperFactory()
+    public ActionResultWrapperFactory(HttpResponseMessage response,
+        IActionReturnDescriptor actionReturnDescriptor,
+        object? actionReturnValue)
     {
         _actionResultWrappers = new IActionResultWrapper[]
             {
                 new GenericActionResultWrapper(),
                 new ObjectResultWrapper(),
+                new JsonResultWrapper(),
                 new FileStreamResultWrapper(),
                 new FileContentResultWrapper(),
                 new StatusCodeResultWrapper(),
@@ -22,19 +29,27 @@ internal sealed class ActionResultWrapperFactory
             }
             .OrderBy(w => w.Priority)
             .ToList();
+        
+        _response = response ?? throw new ArgumentNullException(nameof(response));
+        _actionReturnDescriptor = actionReturnDescriptor ?? throw new ArgumentNullException(nameof(actionReturnDescriptor));
+        _actionReturnValue = actionReturnValue;
     }
 
-    public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
+    public object Wrap()
     {
         foreach (var wrapper in _actionResultWrappers)
         {
-            if (wrapper.CanWrap(responseType))
-                return wrapper.Wrap(response, responseType, payload);
+            if (wrapper.CanWrap(_actionReturnDescriptor))
+            {
+                return wrapper.Wrap(_response, _actionReturnDescriptor, _actionReturnValue);
+            }
         }
 
+        var actionReturnType = _actionReturnDescriptor.GetActionReturnType();
+
         throw new NotSupportedException(
-            $"No ActionResult wrapper registered for '{responseType.FullName}'. " +
-            $"Status={(int)response.StatusCode} ({response.StatusCode}), " +
-            $"ContentType={response.Content?.Headers.ContentType?.ToString() ?? "<null>"}.");
+            $"No ActionResult wrapper registered for '{actionReturnType.FullName}'. " +
+            $"Status={(int)_response.StatusCode} ({_response.StatusCode}), " +
+            $"ContentType={_response.Content?.Headers.ContentType?.ToString() ?? "<null>"}.");
     }
 }

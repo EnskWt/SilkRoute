@@ -4,9 +4,9 @@ using SilkRoute.Tools.ActionReturnTools.ActionReturnDescriptors.ActionReturnDesc
 
 namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper;
 
-internal sealed class FileContentResultWrapper : IActionResultWrapper
+internal sealed class JsonResultWrapper : IActionResultWrapper
 {
-    public int Priority => 30;
+    public int Priority => 15;
 
     public bool CanWrap(IActionReturnDescriptor actionReturnDescriptor)
     {
@@ -16,7 +16,7 @@ internal sealed class FileContentResultWrapper : IActionResultWrapper
         }
 
         var actionReturnType = actionReturnDescriptor.GetActionReturnType();
-        return typeof(FileContentResult).IsAssignableFrom(actionReturnType);
+        return typeof(JsonResult).IsAssignableFrom(actionReturnType);
     }
 
     public object Wrap(
@@ -29,23 +29,17 @@ internal sealed class FileContentResultWrapper : IActionResultWrapper
             throw new ArgumentNullException(nameof(response));
         }
 
-        if (actionReturnValue is not byte[] bytes)
+        var statusCode = (int)response.StatusCode;
+        var contentType = response.Content?.Headers?.ContentType?.ToString();
+
+        var result = new JsonResult(actionReturnValue)
         {
-            throw new InvalidOperationException(
-                $"FileContentResult requires byte[] value, got '{actionReturnValue?.GetType().Name ?? "null"}'.");
-        }
+            StatusCode = statusCode
+        };
 
-        var contentType = response.Content?.Headers?.ContentType?.ToString() ?? "application/octet-stream";
-
-        var result = new FileContentResult(bytes, contentType);
-
-        var fileName =
-            response.Content?.Headers?.ContentDisposition?.FileNameStar ??
-            response.Content?.Headers?.ContentDisposition?.FileName;
-
-        if (!string.IsNullOrWhiteSpace(fileName))
+        if (!string.IsNullOrWhiteSpace(contentType))
         {
-            result.FileDownloadName = fileName;
+            result.ContentType = contentType;
         }
 
         return result;

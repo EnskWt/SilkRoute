@@ -1,21 +1,46 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SilkRoute.Tools.ActionResultTools.ActionResultWrapper.WrapperContract;
+using SilkRoute.Tools.ActionReturnTools.ActionReturnDescriptors.ActionReturnDescriptorContract;
 
 namespace SilkRoute.Tools.ActionResultTools.ActionResultWrapper;
+
 
 internal sealed class ObjectResultWrapper : IActionResultWrapper
 {
     public int Priority => 10;
 
-    public bool CanWrap(Type responseType)
-        => typeof(ObjectResult).IsAssignableFrom(responseType);
-
-    public object Wrap(HttpResponseMessage response, Type responseType, object? payload)
+    public bool CanWrap(IActionReturnDescriptor actionReturnDescriptor)
     {
-        var statusCode = (int)response.StatusCode;
-        var contentType = response.Content?.Headers.ContentType?.ToString();
+        if (actionReturnDescriptor is null)
+        {
+            throw new ArgumentNullException(nameof(actionReturnDescriptor));
+        }
 
-        var obj = (ObjectResult)Activator.CreateInstance(responseType, payload)!;
+        var actionReturnType = actionReturnDescriptor.GetActionReturnType();
+        return typeof(ObjectResult).IsAssignableFrom(actionReturnType);
+    }
+
+    public object Wrap(
+        HttpResponseMessage response,
+        IActionReturnDescriptor actionReturnDescriptor,
+        object? actionReturnValue)
+    {
+        if (response is null)
+        {
+            throw new ArgumentNullException(nameof(response));
+        }
+
+        if (actionReturnDescriptor is null)
+        {
+            throw new ArgumentNullException(nameof(actionReturnDescriptor));
+        }
+
+        var actionReturnType = actionReturnDescriptor.GetActionReturnType();
+
+        var statusCode = (int)response.StatusCode;
+        var contentType = response.Content?.Headers?.ContentType?.ToString();
+
+        var obj = (ObjectResult)Activator.CreateInstance(actionReturnType, actionReturnValue)!;
 
         obj.StatusCode = statusCode;
 
@@ -25,8 +50,10 @@ internal sealed class ObjectResultWrapper : IActionResultWrapper
             obj.ContentTypes.Add(contentType);
         }
 
-        if (obj.Value == null && payload != null)
-            obj.Value = payload;
+        if (obj.Value == null && actionReturnValue != null)
+        {
+            obj.Value = actionReturnValue;
+        }
 
         return obj;
     }
