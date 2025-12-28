@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SilkRoute.Abstractions;
 using SilkRoute.Demo.Shared.Models;
+using SilkRoute.Public.Abstractions;
 
 namespace SilkRoute.Demo.Shared.Contracts;
 

@@ -1,0 +1,68 @@
+﻿using SilkRoute.Internal.Abstractions.ActionResult;
+using SilkRoute.Internal.Abstractions.ActionReturn;
+using SilkRoute.Internal.ActionResult.ActionResultMappers;
+using SilkRoute.Internal.Extensions.ActionResult;
+
+namespace SilkRoute.Internal.ActionResult.ActionResultWrappers;
+
+internal sealed class AbstractActionResultWrapper : IActionResultWrapper
+{
+    public int Priority => int.MaxValue;
+
+    private readonly List<IActionResultMapper> _mappers;
+
+    public AbstractActionResultWrapper()
+    {
+        _mappers = new IActionResultMapper[]
+            {
+                new StatusCodeResultMapper(),
+                new FileContentResultMapper(),
+                new FileStreamResultMapper(),
+                new ContentResultMapper(),
+                new ObjectResultMapper()
+            }
+            .OrderBy(m => m.Priority)
+            .ToList();
+    }
+
+    public bool CanWrap(IActionReturnDescriptor actionReturnDescriptor)
+    {
+        if (actionReturnDescriptor is null)
+        {
+            throw new ArgumentNullException(nameof(actionReturnDescriptor));
+        }
+
+        var actionReturnType = actionReturnDescriptor.GetActionReturnType();
+        return actionReturnType.IsAbstractActionResultType();
+    }
+
+    public object Wrap(
+        HttpResponseMessage response,
+        IActionReturnDescriptor actionReturnDescriptor,
+        object? actionReturnValue)
+    {
+        if (response is null)
+        {
+            throw new ArgumentNullException(nameof(response));
+        }
+
+        if (actionReturnDescriptor is null)
+        {
+            throw new ArgumentNullException(nameof(actionReturnDescriptor));
+        }
+
+        var mapper = _mappers.FirstOrDefault(m => m.CanMap(actionReturnValue));
+        if (mapper != null)
+        {
+            return mapper.Map(response, actionReturnValue);
+        }
+
+        var actionReturnType = actionReturnDescriptor.GetActionReturnType();
+
+        throw new NotSupportedException(
+            $"No payload mapper matched for abstract action result '{actionReturnType.FullName}'. " +
+            $"Status={(int)response.StatusCode} ({response.StatusCode}), " +
+            $"ContentType={response.Content.Headers.ContentType?.ToString() ?? "<null>"}, " +
+            $"HasContentDisposition={(response.Content.Headers.ContentDisposition != null)}");
+    }
+}

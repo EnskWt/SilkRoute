@@ -1,12 +1,12 @@
 using SilkRoute.Demo.Shared.Contracts;
-using SilkRoute.Extensions;
-using SilkRoute.InputFormatters;
-using SilkRoute.Settings;
+using SilkRoute.Public.Extensions;
+using SilkRoute.Public.InputFormatters;
+using SilkRoute.Public.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var settings = new MicroserviceClientSettings
+var settings = new MicroserviceClientOptions
 {
     HttpClientConfiguration = client =>
     {

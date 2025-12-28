@@ -1,4 +1,4 @@
-using SilkRoute.InputFormatters;
+using SilkRoute.Public.InputFormatters;
 
 var builder = WebApplication.CreateBuilder(args);
 
