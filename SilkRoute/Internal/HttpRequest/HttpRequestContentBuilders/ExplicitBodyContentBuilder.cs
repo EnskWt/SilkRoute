@@ -43,10 +43,11 @@ internal sealed class ExplicitBodyContentBuilder : IHttpRequestContentBuilder
         if (value.ContainsNonExplicitFormData() || value.ContainsNestedStream())
         {
             throw new InvalidOperationException(
-                $"Parameter of type '{value.GetType().Name}' contains a Stream or Form-Data. " +
-                "You must pass streams either as top-level [FromBody] (Stream) or [FromForm] (IFormFile), " +
-                "but not embed them in a complex DTO.");
-            // TODO: Verify error message, maybe it's not only about stream
+                $"Parameter of type '{value.GetType().Name}' contains a nested Stream and/or form-data (e.g., IFormFile). " +
+                "Streams and files cannot be embedded inside a complex JSON DTO. " +
+                "Pass binary content as a top-level [FromBody] Stream/byte[] (raw body) " +
+                "or send files using multipart/form-data and bind them as top-level [FromForm] IFormFile / IFormFileCollection. " +
+                "Do not nest Stream/IFormFile/form-data inside other objects.");
         }
 
         var serializer = _bodySerializers.First(x => x.CanSerialize(value));
