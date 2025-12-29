@@ -19,7 +19,7 @@ builder.Services.AddMicroserviceClient<ITestMicroservice>(settings);
 builder.Services
     .AddControllers(options =>
     {
-        options.InputFormatters.Insert(0, new AnyStreamOrBytesInputFormatter());
+        options.InputFormatters.Insert(0, new BinaryBodyInputFormatter());
         options.ReturnHttpNotAcceptable = false;
     });
 

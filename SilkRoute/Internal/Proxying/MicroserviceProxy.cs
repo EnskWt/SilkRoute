@@ -122,9 +122,9 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
 
         var parameters = targetMethod.GetParameters();
 
-        var requestBuilder = new HttpRequestBuilder(new HttpMethod(method), uri);
+        var requestBuilder = new HttpRequestBuilder(new HttpMethod(method), uri, parameters, args);
 
-        requestBuilder.BindAllParameters(parameters, args);
+        requestBuilder.BindAllParameters();
 
         requestBuilder.EnsureNoBodyAndFormDataConflict();
 

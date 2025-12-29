@@ -9,27 +9,29 @@ using SilkRoute.Internal.HttpRequest.HttpRequestParameterBinders;
 
 namespace SilkRoute.Internal.HttpRequest;
 
-// TODO: передавати параметри в конструктор
 internal class HttpRequestBuilder
 {
-    public HttpMethod? Method { get; }
-    public string? UriTemplate { get; }
-
     internal Dictionary<string, string> RouteParams { get; } = new();
     internal QueryBuilder QueryBuilder { get; } = new();
     internal List<(string Name, object Value)> FormParams { get; } = new();
     internal Dictionary<string, string> Headers { get; } = new();
     internal (string Name, object Value)? ExplicitBody { get; set; }
     internal List<(string Name, object Value)> NoAttributeParams { get; } = new();
-
-
+    
     private readonly List<IHttpRequestContentBuilder> _contentBuilders;
     private readonly List<IHttpRequestParameterBinder> _parameterBinders;
+    
+    private readonly HttpMethod _httpMethod;
+    private readonly string _uriTemplate;
+    private readonly ParameterInfo[] _parameterInfos;
+    private readonly object?[]? _parameterValues;
 
-    internal HttpRequestBuilder(HttpMethod method, string uriTemplate)
+    internal HttpRequestBuilder(HttpMethod method, string uriTemplate, ParameterInfo[] parameterInfos, object?[]? parameterValues)
     {
-        Method = method;
-        UriTemplate = uriTemplate;
+        _httpMethod = method;
+        _uriTemplate = uriTemplate;
+        _parameterInfos = parameterInfos;
+        _parameterValues = parameterValues;
 
         _contentBuilders = new List<IHttpRequestContentBuilder>()
         {
@@ -100,19 +102,14 @@ internal class HttpRequestBuilder
         }
     }
 
-    private void BindRouteParametersFromTemplate(ParameterInfo[] parameters, object?[]? args)
+    private void BindRouteParametersFromTemplate()
     {
-        if (UriTemplate == null)
-        {
-            return;
-        }
+        var templateParamNames = _uriTemplate.ExtractRouteParameters();
 
-        var templateParamNames = UriTemplate.ExtractRouteParameters();
-
-        for (var i = 0; i < parameters.Length; i++)
+        for (var i = 0; i < _parameterInfos.Length; i++)
         {
-            var p = parameters[i];
-            var value = args != null && i < args.Length ? args[i] : null;
+            var p = _parameterInfos[i];
+            var value = _parameterValues != null && i < _parameterValues.Length ? _parameterValues[i] : null;
             if (value == null)
             {
                 continue;
@@ -135,17 +132,17 @@ internal class HttpRequestBuilder
         }
     }
 
-    private void BindParametersByAttribute(ParameterInfo[] parameters, object?[]? args)
+    private void BindParametersByAttribute( )
     {
-        if (args == null || args.Length == 0 || parameters.Length == 0)
+        if (_parameterValues == null || _parameterValues.Length == 0 || _parameterInfos.Length == 0)
         {
             return;
         }
 
-        for (var i = 0; i < parameters.Length; i++)
+        for (var i = 0; i < _parameterInfos.Length; i++)
         {
-            var parameter = parameters[i];
-            var value = args != null && i < args.Length ? args[i] : null;
+            var parameter = _parameterInfos[i];
+            var value = _parameterValues != null && i < _parameterValues.Length ? _parameterValues[i] : null;
 
             if (value == null) continue;
             foreach (var binder in _parameterBinders)
@@ -159,10 +156,10 @@ internal class HttpRequestBuilder
         }
     }
 
-    internal void BindAllParameters(ParameterInfo[] parameters, object?[]? args)
+    internal void BindAllParameters()
     {
-        BindRouteParametersFromTemplate(parameters, args);
-        BindParametersByAttribute(parameters, args);
+        BindRouteParametersFromTemplate();
+        BindParametersByAttribute();
     }
 
     internal (string method, string uri, HttpContent? content, IDictionary<string, string> headers) BuildRequest()
@@ -183,7 +180,7 @@ internal class HttpRequestBuilder
             QueryBuilder.AddFlattenedParameter(p.Name, p.Value);
         }
 
-        var uri = UriTemplate!;
+        var uri = _uriTemplate!;
         uri = uri.ApplyRouteValues(RouteParams);
 
         if (QueryBuilder.Any())
@@ -191,6 +188,6 @@ internal class HttpRequestBuilder
             uri += QueryBuilder.ToQueryString();
         }
 
-        return (Method!.Method, uri, content, Headers);
+        return (_httpMethod.Method, uri, content, Headers);
     }
 }
