@@ -7,8 +7,6 @@ namespace SilkRoute.Internal.HttpRequest.HttpRequestFormData.HttpRequestFormData
 
 internal sealed class ComplexContentFormDataPartWriter : IHttpRequestFormDataPartWriter
 {
-    public int Priority => 4;
-
     public bool CanWritePart(object value)
     {
         if (value is null)

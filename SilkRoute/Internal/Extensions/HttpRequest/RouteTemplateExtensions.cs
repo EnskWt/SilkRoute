@@ -5,52 +5,22 @@ namespace SilkRoute.Internal.Extensions.HttpRequest;
 
 internal static class RouteTemplateExtensions
 {
-    private static readonly Regex PlaceholderPattern =
-        new(@"\{(?<name>[^}:]+)(:(?<constraints>[^}]+))?\}", RegexOptions.Compiled);
+    private static readonly Regex RouteParameterPattern =
+        new(@"\{\*?(?<name>[^}:?=]+)(?:\?(?=[:}])|=[^}:]+)?(?:\:(?<constraints>[^}]+))?\}",
+            RegexOptions.Compiled);
 
-    public static IReadOnlyList<(string Name, string? TypeConstraint)> ExtractRouteParameters(this string template)
+    public static IReadOnlyList<string> ExtractRouteParameters(this string template)
     {
         if (template is null)
         {
             throw new ArgumentNullException(nameof(template));
         }
 
-        return PlaceholderPattern.Matches(template)
-            .Select(m =>
-            {
-                var name = m.Groups["name"].Value;
-
-                string? typeConstraint = null;
-                if (m.Groups["constraints"].Success)
-                {
-                    typeConstraint = ExtractTypeConstraint(m.Groups["constraints"].Value);
-                }
-
-                return (Name: name, TypeConstraint: typeConstraint);
-            })
+        return RouteParameterPattern.Matches(template)
+            .Select(m => m.Groups["name"].Value)
             .ToList();
     }
-
-    private static string? ExtractTypeConstraint(string constraints)
-    {
-        foreach (var part in constraints.Split(':', StringSplitOptions.RemoveEmptyEntries))
-        {
-            var constraint = part;
-            var paren = constraint.IndexOf('(');
-            if (paren >= 0)
-            {
-                constraint = constraint.Substring(0, paren);
-            }
-
-            if (RouteConstraintConstants.TypeConstraints.Contains(constraint))
-            {
-                return constraint.ToLowerInvariant();
-            }
-        }
-
-        return null;
-    }
-
+    
     public static string ApplyRouteValues(this string template, IReadOnlyDictionary<string, string> routeValues)
     {
         if (template is null)
@@ -67,34 +37,36 @@ internal static class RouteTemplateExtensions
         {
             return template;
         }
+        
+        var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var kv in routeValues)
+        {
+            if (!values.ContainsKey(kv.Key))
+            {
+                values.Add(kv.Key, kv.Value);
+            }
+        }
 
-        var result = PlaceholderPattern.Replace(template, m =>
+        var result = RouteParameterPattern.Replace(template, m =>
         {
             var name = m.Groups["name"].Value;
-            var constraintsText = m.Groups["constraints"].Success ? m.Groups["constraints"].Value : null;
 
-            if (!routeValues.TryGetValue(name, out var value))
+            if (!values.TryGetValue(name, out var value))
             {
                 return m.Value;
             }
-
-            if (!RouteConstraintConstants.MatchesAll(constraintsText, value))
-            {
-                return m.Value;
-            }
-
+            
             return Uri.EscapeDataString(value);
         });
 
-        if (PlaceholderPattern.IsMatch(result))
+        if (RouteParameterPattern.IsMatch(result))
         {
-            var missingOrMismatched = result.ExtractRouteParameters()
-                .Select(x => x.Name)
+            var missing = result.ExtractRouteParameters()
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
             throw new InvalidOperationException(
-                $"Not all route parameters were provided or matched constraints. Missing: {string.Join(", ", missingOrMismatched)}. Template: '{template}'.");
+                $"Not all route parameters were provided. Missing: {string.Join(", ", missing)}. Template: '{template}'.");
         }
 
         return result;

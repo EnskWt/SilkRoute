@@ -20,7 +20,7 @@ internal sealed class NoAttributeParameterContentBuilder : IHttpRequestContentBu
             new StringBodySerializer(),
             new JsonBodySerializer()
         }.OrderBy(x => x.Priority).ToList();
-        
+
         var partWriters = new List<IHttpRequestFormDataPartWriter>
         {
             new SingleFileFormDataPartWriter(),
@@ -28,7 +28,7 @@ internal sealed class NoAttributeParameterContentBuilder : IHttpRequestContentBu
             new SimpleScalarContentFormDataPartWriter(),
             new EnumerableContentFormDataPartWriter(),
             new ComplexContentFormDataPartWriter()
-        }.OrderBy(x => x.Priority).ToList();
+        };
 
         _formContext = new HttpRequestFormDataPartWriterContext(partWriters);
     }

@@ -6,8 +6,6 @@ namespace SilkRoute.Internal.ActionResult.ActionResultWrappers;
 
 internal sealed class JsonResultWrapper : IActionResultWrapper
 {
-    public int Priority => 15;
-
     public bool CanWrap(IActionReturnDescriptor actionReturnDescriptor)
     {
         if (actionReturnDescriptor is null)
@@ -30,7 +28,7 @@ internal sealed class JsonResultWrapper : IActionResultWrapper
         }
 
         var statusCode = (int)response.StatusCode;
-        var contentType = response.Content?.Headers?.ContentType?.ToString();
+        var contentType = response.Content.Headers.ContentType?.ToString();
 
         var result = new JsonResult(actionReturnValue)
         {

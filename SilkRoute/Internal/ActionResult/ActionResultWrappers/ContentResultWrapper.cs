@@ -6,8 +6,6 @@ namespace SilkRoute.Internal.ActionResult.ActionResultWrappers;
 
 internal sealed class ContentResultWrapper : IActionResultWrapper
 {
-    public int Priority => 50;
-
     public bool CanWrap(IActionReturnDescriptor actionReturnDescriptor)
     {
         if (actionReturnDescriptor is null)

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using SilkRoute.Internal.Abstractions.HttpRequest;
 using SilkRoute.Internal.Extensions.Common;
 using SilkRoute.Internal.Extensions.HttpRequest;
@@ -106,9 +107,7 @@ internal class HttpRequestBuilder
             return;
         }
 
-        var templateRouteParams = UriTemplate.ExtractRouteParameters()
-            .Select(ph => (ph.Name, ph.TypeConstraint))
-            .ToList();
+        var templateParamNames = UriTemplate.ExtractRouteParameters();
 
         for (var i = 0; i < parameters.Length; i++)
         {
@@ -118,16 +117,20 @@ internal class HttpRequestBuilder
             {
                 continue;
             }
+            
+            var fromRoute = p.GetCustomAttribute<FromRouteAttribute>(inherit: true);
 
-            var parameterRouteTypeConstraint = p.ParameterType.ToRouteTypeConstraint();
-            var matches = templateRouteParams
-                .Any(ph =>
-                    ph.Name == p.Name
-                    && (ph.TypeConstraint == null || ph.TypeConstraint == parameterRouteTypeConstraint));
+            var routeParameterName =
+                !string.IsNullOrWhiteSpace(fromRoute?.Name)
+                    ? fromRoute.Name!
+                    : p.Name!;
+
+            var matches = templateParamNames.Any(n =>
+                string.Equals(n, routeParameterName, StringComparison.OrdinalIgnoreCase));
 
             if (matches)
             {
-                RouteParams[p.Name!] = value.ToString()!;
+                RouteParams[routeParameterName] = value.ToString()!;
             }
         }
     }

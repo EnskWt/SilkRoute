@@ -3,7 +3,7 @@ using SilkRoute.Internal.HttpRequest.HttpRequestFormData;
 
 namespace SilkRoute.Internal.Abstractions.HttpRequest;
 
-internal interface IHttpRequestFormDataPartWriter : IPrioritized
+internal interface IHttpRequestFormDataPartWriter
 {
     bool CanWritePart(object value);
 

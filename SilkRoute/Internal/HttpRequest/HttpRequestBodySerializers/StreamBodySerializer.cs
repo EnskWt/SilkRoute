@@ -5,7 +5,7 @@ namespace SilkRoute.Internal.HttpRequest.HttpRequestBodySerializers;
 
 internal class StreamBodySerializer : IHttpRequestBodySerializer
 {
-    public int Priority => 1;
+    public int Priority => 10;
     public bool CanSerialize(object val) => val is Stream;
     public HttpContent Serialize(object val)
     {

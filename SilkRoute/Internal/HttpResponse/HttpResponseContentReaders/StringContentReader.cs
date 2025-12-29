@@ -7,8 +7,6 @@ namespace SilkRoute.Internal.HttpResponse.HttpResponseContentReaders;
 
 internal sealed class StringContentReader : IHttpResponseContentReader
 {
-    public int Priority => 30;
-
     public bool CanRead(HttpResponseMessage responseMessage, IActionReturnDescriptor descriptor)
     {
         if (descriptor.ActionReturnTypeMatchesString())

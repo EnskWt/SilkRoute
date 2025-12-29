@@ -10,8 +10,6 @@ namespace SilkRoute.Internal.HttpResponse.HttpResponseContentReaders;
 
 internal sealed class JsonContentReader : IHttpResponseContentReader
 {
-    public int Priority => int.MaxValue;
-
     public bool CanRead(HttpResponseMessage responseMessage, IActionReturnDescriptor descriptor)
     {
         if (descriptor.ActionReturnTypeMatchesJson())

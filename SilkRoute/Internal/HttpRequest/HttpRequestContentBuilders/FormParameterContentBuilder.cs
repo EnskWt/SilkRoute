@@ -18,12 +18,12 @@ internal sealed class FormParameterContentBuilder : IHttpRequestContentBuilder
             new SimpleScalarContentFormDataPartWriter(),
             new EnumerableContentFormDataPartWriter(),
             new ComplexContentFormDataPartWriter()
-        }.OrderBy(x => x.Priority).ToList();
+        };
         
         _formContext = new HttpRequestFormDataPartWriterContext(partWriters);
     }
 
-    public int Priority => 1;
+    public int Priority => 10;
 
     public bool CanBuild(HttpRequestBuilder httpRequestBuilder)
     {

@@ -7,8 +7,6 @@ namespace SilkRoute.Internal.ActionResult.ActionResultWrappers;
 
 internal sealed class StatusCodeResultWrapper : IActionResultWrapper
 {
-    public int Priority => 40;
-
     public bool CanWrap(IActionReturnDescriptor actionReturnDescriptor)
     {
         if (actionReturnDescriptor is null)

@@ -5,7 +5,7 @@ namespace SilkRoute.Internal.HttpRequest.HttpRequestParameterBinders;
 
 internal class BodyParameterBinder : AttributeParameterBinder<FromBodyAttribute>
 {
-    public override int Priority => 4;
+    public override int Priority => 40;
 
     public override void Bind(HttpRequestBuilder httpRequestBuilder, ParameterInfo parameterInfo, object value)
     {

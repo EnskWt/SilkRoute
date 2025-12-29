@@ -5,7 +5,7 @@ namespace SilkRoute.Internal.HttpRequest.HttpRequestParameterBinders;
 
 internal abstract class AttributeParameterBinder<T> : IHttpRequestParameterBinder where T : Attribute
 {
-    public virtual int Priority => 0;
+    public abstract int Priority { get; }
 
     public bool CanBind(ParameterInfo parameterInfo, object? value)
     {

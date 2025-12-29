@@ -3,7 +3,7 @@ using SilkRoute.Internal.Abstractions.Common;
 
 namespace SilkRoute.Internal.Abstractions.ActionResult;
 
-internal interface IActionResultWrapper : IPrioritized
+internal interface IActionResultWrapper
 {
     bool CanWrap(IActionReturnDescriptor actionReturnDescriptor);
 

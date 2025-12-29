@@ -3,7 +3,7 @@ using SilkRoute.Internal.Abstractions.Common;
 
 namespace SilkRoute.Internal.Abstractions.HttpResponse;
 
-internal interface IHttpResponseContentReader : IPrioritized
+internal interface IHttpResponseContentReader
 {
     bool CanRead(HttpResponseMessage responseMessage, IActionReturnDescriptor descriptor);
 

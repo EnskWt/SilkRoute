@@ -5,17 +5,17 @@ namespace SilkRoute.Internal.HttpRequest.HttpRequestParameterBinders;
 
 internal class HeaderParameterBinder : AttributeParameterBinder<FromHeaderAttribute>
 {
-    public override int Priority => 1;
+    public override int Priority => 10;
 
     public override void Bind(HttpRequestBuilder httpRequestBuilder, ParameterInfo parameterInfo, object value)
     {
         var fromHeader = parameterInfo.GetCustomAttribute<FromHeaderAttribute>(inherit: true);
 
-        var headerName =
+        var headerParameterName =
             !string.IsNullOrWhiteSpace(fromHeader?.Name)
-                ? fromHeader!.Name!
+                ? fromHeader.Name!
                 : parameterInfo.Name!;
 
-        httpRequestBuilder.Headers[headerName] = value.ToString()!;
+        httpRequestBuilder.Headers[headerParameterName] = value.ToString()!;
     }
 }

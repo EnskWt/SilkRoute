@@ -16,17 +16,15 @@ internal sealed class HttpResponseReader
     {
         _response = response ?? throw new ArgumentNullException(nameof(response));
         _actionReturnDescriptor = actionReturnDescriptor ?? throw new ArgumentNullException(nameof(actionReturnDescriptor));
-        
+
         _contentReaders = new List<IHttpResponseContentReader>
-            {
-                new VoidContentReader(),
-                new StreamContentReader(),
-                new ByteArrayContentReader(),
-                new StringContentReader(),
-                new JsonContentReader()
-            }
-            .OrderBy(r => r.Priority)
-            .ToList();
+        {
+            new VoidContentReader(),
+            new StreamContentReader(),
+            new ByteArrayContentReader(),
+            new StringContentReader(),
+            new JsonContentReader()
+        };
     }
 
     public async Task<object?> ReadResponseContent()

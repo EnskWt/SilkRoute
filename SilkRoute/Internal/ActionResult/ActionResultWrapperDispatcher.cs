@@ -15,19 +15,17 @@ internal sealed class ActionResultWrapperDispatcher
         IActionReturnDescriptor actionReturnDescriptor,
         object? actionReturnValue)
     {
-        _actionResultWrappers = new IActionResultWrapper[]
-            {
-                new GenericActionResultWrapper(),
-                new ObjectResultWrapper(),
-                new JsonResultWrapper(),
-                new FileStreamResultWrapper(),
-                new FileContentResultWrapper(),
-                new StatusCodeResultWrapper(),
-                new ContentResultWrapper(),
-                new AbstractActionResultWrapper()
-            }
-            .OrderBy(w => w.Priority)
-            .ToList();
+        _actionResultWrappers = new List<IActionResultWrapper>
+        {
+            new GenericActionResultWrapper(),
+            new ObjectResultWrapper(),
+            new JsonResultWrapper(),
+            new FileStreamResultWrapper(),
+            new FileContentResultWrapper(),
+            new StatusCodeResultWrapper(),
+            new ContentResultWrapper(),
+            new AbstractActionResultWrapper()
+        };
         
         _response = response ?? throw new ArgumentNullException(nameof(response));
         _actionReturnDescriptor = actionReturnDescriptor ?? throw new ArgumentNullException(nameof(actionReturnDescriptor));

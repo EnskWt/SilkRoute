@@ -5,7 +5,7 @@ namespace SilkRoute.Internal.HttpRequest.HttpRequestBodySerializers;
 
 internal class ByteArrayBodySerializer : IHttpRequestBodySerializer
 {
-    public int Priority => 2;
+    public int Priority => 20;
     public bool CanSerialize(object val) => val is byte[];
     public HttpContent Serialize(object val)
     {

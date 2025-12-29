@@ -7,8 +7,6 @@ namespace SilkRoute.Internal.ActionResult.ActionResultWrappers;
 
 internal sealed class AbstractActionResultWrapper : IActionResultWrapper
 {
-    public int Priority => int.MaxValue;
-
     private readonly List<IActionResultMapper> _mappers;
 
     public AbstractActionResultWrapper()

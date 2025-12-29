@@ -5,8 +5,6 @@ namespace SilkRoute.Internal.HttpRequest.HttpRequestFormData.HttpRequestFormData
 
 internal sealed class EnumerableContentFormDataPartWriter : IHttpRequestFormDataPartWriter
 {
-    public int Priority => 3;
-
     public bool CanWritePart(object value)
     {
         if (value is null)
@@ -14,7 +12,7 @@ internal sealed class EnumerableContentFormDataPartWriter : IHttpRequestFormData
             throw new ArgumentNullException(nameof(value));
         }
 
-        return value is IEnumerable && value is not string;
+        return value is IEnumerable and not string;
     }
 
     public void WritePart(

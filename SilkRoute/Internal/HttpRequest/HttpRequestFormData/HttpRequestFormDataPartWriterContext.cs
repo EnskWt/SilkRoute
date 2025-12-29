@@ -14,7 +14,6 @@ internal sealed class HttpRequestFormDataPartWriterContext
         }
 
         _writers = writers
-            .OrderBy(x => x.Priority)
             .ToList();
     }
 
