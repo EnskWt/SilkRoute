@@ -164,11 +164,11 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
 
         var returnsTask = typeof(Task).IsAssignableFrom(returnType);
 
-        var resultType = returnsTask
+        var resultReturnType = returnsTask
             ? (returnType.IsGenericType ? returnType.GetGenericArguments()[0] : typeof(void))
             : returnType;
 
-        return ActionReturnDescriptorFactory.Create(resultType);
+        return ActionReturnDescriptorFactory.Create(resultReturnType);
     }
     
     private Task<object?> ReadResponse(

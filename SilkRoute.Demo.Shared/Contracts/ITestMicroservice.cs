@@ -13,9 +13,15 @@ public interface ITestMicroservice : IMicroserviceClient
 
     [HttpGet("api/test/bind/query/contains-primitives")]
     Task<RequestSnapshot> Query_Contains_Primitives([FromQuery] int id, [FromQuery] bool flag, [FromQuery] string name);
+    
+    [HttpGet("api/test/bind/query/contains-primitive-with-name")]
+    Task<RequestSnapshot> Query_Contains_Primitive_WithName([FromQuery(Name = "q")] string query);
 
     [HttpGet("api/test/bind/query/contains-primitive-collections")]
     Task<RequestSnapshot> Query_Contains_Primitive_Collections([FromQuery] int[] ids, [FromQuery] List<string> tags);
+    
+    [HttpGet("api/test/bind/query/contains-primitive-dictionary")]
+    Task<RequestSnapshot> Query_Contains_Primitive_Dictionary([FromQuery] Dictionary<string, string> values);
 
     [HttpGet("api/test/bind/query/contains-complexdto")]
     Task<RequestSnapshot> Query_Contains_ComplexDto([FromQuery] ComplexDto dto);
@@ -39,8 +45,17 @@ public interface ITestMicroservice : IMicroserviceClient
 
     #region Route and Header
 
-    [HttpGet("api/test/bind/route/contains-primitive/{id:int}")]
-    Task<RequestSnapshot> Route_Contains_Primitive([FromRoute] int id);
+    [HttpGet("api/test/bind/route/contains-primitives/{id:int}/{name:alpha}")]
+    Task<RequestSnapshot> Route_Contains_Primitives([FromRoute] int id, [FromRoute] string name);
+    
+    [HttpGet("api/test/bind/route/contains-primitive-with-name/{id:int}")]
+    Task<RequestSnapshot> Route_Contains_Primitive_WithName([FromRoute(Name = "id")] int routeId);
+    
+    [HttpGet("api/test/bind/route/contains-primitive-and-has-length-constraint/{id:length(15)}")]
+    Task<RequestSnapshot> Route_Contains_Primitive_And_Has_Length_Constraint([FromRoute] string id);
+
+    [HttpGet("api/test/bind/route/contains-primitive-and-has-length-constraint/{id:alpha:length(15)}")]
+    Task<RequestSnapshot> Route_Contains_Primitive_And_Has_Length_And_Alpha_Constraints([FromRoute] string id);
 
     [HttpGet("api/test/bind/header/contains-primitive")]
     Task<RequestSnapshot> Header_Contains_Primitive([FromHeader(Name = "X-Test")] string value);
@@ -51,6 +66,12 @@ public interface ITestMicroservice : IMicroserviceClient
 
     [HttpPost("api/test/bind/body/contains-complexdto")]
     Task<RequestSnapshot> Body_Contains_ComplexDto([FromBody] ComplexDto dto);
+    
+    [HttpPost("api/test/bind/body/contains-primitive-collection")]
+    Task<RequestSnapshot> Body_Contains_Primitive_Collection([FromBody] List<string> values);
+    
+    [HttpPost("api/test/bind/body/contains-primitive-dictionary")]
+    Task<RequestSnapshot> Body_Contains_Primitive_Dictionary([FromBody] Dictionary<string, string> values);
 
     [HttpPost("api/test/bind/body/contains-primitive")]
     Task<RequestSnapshot> Body_Contains_Primitive([FromBody] string text);
@@ -79,6 +100,15 @@ public interface ITestMicroservice : IMicroserviceClient
 
     [HttpPost("api/test/bind/form/contains-primitives")]
     Task<RequestSnapshot> Form_Contains_Primitives([FromForm] string name, [FromForm] int id);
+    
+    [HttpPost("api/test/bind/form/contains-primitive-with-name")]
+    Task<RequestSnapshot> Form_Contains_Primitive_WithName([FromForm(Name = "comment")] string text);
+    
+    [HttpPost("api/test/bind/form/contains-primitive-dictionary")]
+    Task<RequestSnapshot> Form_Contains_Primitive_Dictionary([FromForm] Dictionary<string, string> values);
+    
+    [HttpPost("api/test/bind/form/contains-primitive-collection")]
+    Task<RequestSnapshot> Form_Contains_Primitive_Collection([FromForm] List<string> values);
 
     [HttpPost("api/test/bind/form/contains-iformfile")]
     [Consumes("multipart/form-data")]
@@ -89,6 +119,12 @@ public interface ITestMicroservice : IMicroserviceClient
 
     [HttpPost("api/test/bind/form/contains-iformfiles")]
     Task<RequestSnapshot> Form_Contains_IFormFiles([FromForm] List<IFormFile> files);
+    
+    [HttpPost("api/test/bind/form/contains-iformfilecollection")]
+    Task<RequestSnapshot> Form_Contains_IFormFileCollection([FromForm] IFormFileCollection files);
+
+    [HttpPost("api/test/bind/form/contains-iformfilecollection-and-primitives")]
+    Task<RequestSnapshot> Form_Contains_IFormFileCollection_And_Primitives([FromForm] IFormFileCollection files, [FromForm] string comment);
 
     #endregion
 
@@ -151,7 +187,14 @@ public interface ITestMicroservice : IMicroserviceClient
     Task<RequestSnapshot> AllAttrs_FormPrimitive_And_HeaderPrimitive(
         [FromForm] string comment,
         [FromHeader(Name = "X-Trace")] string traceId);
-
+    
+    [HttpPost("api/test/bind/allattrs/route-primitive-and-query-primitive-and-header-primitive-and-form-primitive-with-names/{id:int}")]
+    Task<RequestSnapshot> AllAttrs_RoutePrimitive_And_QueryPrimitive_And_HeaderPrimitive_And_FormPrimitive_WithNames(
+        [FromRoute(Name = "id")] int routeId,
+        [FromQuery(Name = "q")] string query,
+        [FromHeader(Name = "X-Trace")] string traceId,
+        [FromForm(Name = "comment")] string comment);
+    
     #endregion
 
     #region Mixed different attributes and no attributes
@@ -202,6 +245,12 @@ public interface ITestMicroservice : IMicroserviceClient
 
     [HttpGet("api/test/return/domain/stream")]
     Stream Domain_Stream();
+    
+    [HttpGet("api/test/return/domain/iformfile")]
+    IFormFile Domain_IFormFile();
+
+    [HttpGet("api/test/return/domain/iformfilecollection")]
+    IFormFileCollection Domain_IFormFileCollection();
 
     [HttpGet("api/test/return/domain/task")]
     Task Domain_Task();
@@ -249,9 +298,18 @@ public interface ITestMicroservice : IMicroserviceClient
 
     [HttpGet("api/test/return/concrete-actionresult/objectresult-complexdto")]
     ObjectResult ObjectResult_ComplexDto();
+    
+    [HttpGet("api/test/return/concrete-actionresult/okobjectresult-complexdto")]
+    OkObjectResult OkObjectResult_ComplexDto();
+    
+    [HttpGet("api/test/return/concrete-actionresult/jsonresult-complexdto")]
+    JsonResult JsonResult_ComplexDto();
 
     [HttpGet("api/test/return/concrete-actionresult/statuscoderesult-418")]
     StatusCodeResult StatusCodeResult_418();
+    
+    [HttpGet("api/test/return/concrete-actionresult/okresult-200")]
+    OkResult OkResult_200();
 
     [HttpGet("api/test/return/concrete-actionresult/filecontentresult-bytes")]
     FileContentResult FileContentResult_Bytes();
