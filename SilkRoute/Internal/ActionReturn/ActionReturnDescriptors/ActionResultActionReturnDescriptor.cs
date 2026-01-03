@@ -58,44 +58,14 @@ internal sealed class ActionResultActionReturnDescriptor : IActionReturnDescript
 
         return typeof(FileContentResult).IsAssignableFrom(_actionResultActionReturnType);
     }
-
-    public bool ActionReturnTypeMatchesJson()
+    
+    public bool ActionReturnTypeIsAbstractOrInterface()
     {
         if (_actionResultActionReturnType.IsGenericActionResultType())
         {
-            var valueType = _actionResultActionReturnType.GetGenericActionResultValueType();
-
-            if (valueType == typeof(void))
-            {
-                return false;
-            }
-
-            if (valueType == typeof(string))
-            {
-                return false;
-            }
-
-            if (valueType == typeof(Stream))
-            {
-                return false;
-            }
-
-            if (valueType == typeof(byte[]))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        if (typeof(JsonResult).IsAssignableFrom(_actionResultActionReturnType))
-        {
-            return true;
-        }
-        
-        if (typeof(ObjectResult).IsAssignableFrom(_actionResultActionReturnType))
-        {
-            return true;
+            var type = _actionResultActionReturnType.GetGenericActionResultValueType();
+            
+            return type.IsAbstract || type.IsInterface;
         }
 
         return false;

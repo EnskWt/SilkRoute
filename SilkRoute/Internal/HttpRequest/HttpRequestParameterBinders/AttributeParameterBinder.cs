@@ -7,7 +7,7 @@ internal abstract class AttributeParameterBinder<T> : IHttpRequestParameterBinde
 {
     public abstract int Priority { get; }
 
-    public bool CanBind(ParameterInfo parameterInfo, object? value)
+    public bool CanBind(ParameterInfo parameterInfo, object value)
     {
         if (value == null)
         {

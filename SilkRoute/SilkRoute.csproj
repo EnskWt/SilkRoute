@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
+		<Nullable>disable</Nullable>
 
 		<!-- NuGet package metadata -->
 		<PackageId>SilkRoute</PackageId>
@@ -16,6 +16,7 @@
 		<PackageTags>microservice;http;api</PackageTags>
 		<RepositoryUrl>https://github.com/EnskWt/SilkRoute</RepositoryUrl>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<OutputType>Library</OutputType>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -14,10 +14,11 @@ internal sealed class HttpRequestFormDataPartWriterContext
         }
 
         _writers = writers
+            .OrderBy(w => w.Priority)
             .ToList();
     }
 
-    public void AddPart(MultipartFormDataContent form, string name, object? value)
+    public void AddPart(MultipartFormDataContent form, string name, object value)
     {
         if (form is null)
         {
@@ -34,7 +35,13 @@ internal sealed class HttpRequestFormDataPartWriterContext
             return;
         }
 
-        var writer = _writers.First(x => x.CanWritePart(value));
+        var writer = _writers.FirstOrDefault(x => x.CanWritePart(value));
+        if (writer is null)
+        {
+            throw new InvalidOperationException(
+                $"No form-data writer can handle value of type '{value.GetType().FullName}' for field '{name}'.");
+        }
+
         writer.WritePart(this, form, name, value);
     }
 }

@@ -8,5 +8,5 @@ internal interface IActionReturnDescriptor
     bool ActionReturnTypeMatchesString();
     bool ActionReturnTypeMatchesStream();
     bool ActionReturnTypeMatchesByteArray();
-    bool ActionReturnTypeMatchesJson();
+    bool ActionReturnTypeIsAbstractOrInterface();
 }

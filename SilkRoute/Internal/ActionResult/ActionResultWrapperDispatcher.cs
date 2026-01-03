@@ -8,12 +8,12 @@ internal sealed class ActionResultWrapperDispatcher
 {
     private readonly HttpResponseMessage _response;
     private readonly IActionReturnDescriptor _actionReturnDescriptor;
-    private readonly object? _actionReturnValue;
+    private readonly object _actionReturnValue;
     private readonly List<IActionResultWrapper> _actionResultWrappers;
 
     public ActionResultWrapperDispatcher(HttpResponseMessage response,
         IActionReturnDescriptor actionReturnDescriptor,
-        object? actionReturnValue)
+        object actionReturnValue)
     {
         _actionResultWrappers = new List<IActionResultWrapper>
         {

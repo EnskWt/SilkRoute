@@ -6,7 +6,7 @@ namespace SilkRoute.Internal.HttpRequest.HttpRequestParameterBinders;
 internal class NoAttributeParameterBinder : IHttpRequestParameterBinder
 {
     public int Priority => int.MaxValue;
-    public bool CanBind(ParameterInfo parameterInfo, object? value) => value != null;
+    public bool CanBind(ParameterInfo parameterInfo, object value) => value != null;
 
     public void Bind(HttpRequestBuilder httpRequestBuilder, ParameterInfo parameterInfo, object value)
     {

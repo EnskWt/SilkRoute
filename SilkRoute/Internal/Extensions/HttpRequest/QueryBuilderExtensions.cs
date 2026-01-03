@@ -9,7 +9,7 @@ internal static class QueryBuilderExtensions
     public static void AddFlattenedParameter(
         this QueryBuilder queryBuilder,
         string parameterName,
-        object? parameterValue)
+        object parameterValue)
     {
         if (queryBuilder is null)
         {
@@ -82,7 +82,7 @@ internal static class QueryBuilderExtensions
     
     private static void ThrowIfContainsUnsupportedQueryData(string name, object value)
     {
-        if (value.ContainsNonExplicitFormData())
+        if (value. ContainsNonExplicitFormData())
         {
             throw new InvalidOperationException(
                 $"Cannot bind form data in parameter '{name}' to query string. Use [FromForm] or remove form data parameter.");

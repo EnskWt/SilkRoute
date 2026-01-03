@@ -35,29 +35,9 @@ internal sealed class DirectActionReturnDescriptor : IActionReturnDescriptor
     {
         return _actionReturnType == typeof(byte[]);
     }
-
-    public bool ActionReturnTypeMatchesJson()
+    
+    public bool ActionReturnTypeIsAbstractOrInterface()
     {
-        if (ActionReturnTypeMatchesVoid())
-        {
-            return false;
-        }
-
-        if (ActionReturnTypeMatchesString())
-        {
-            return false;
-        }
-
-        if (ActionReturnTypeMatchesStream())
-        {
-            return false;
-        }
-
-        if (ActionReturnTypeMatchesByteArray())
-        {
-            return false;
-        }
-
-        return true;
+        return _actionReturnType.IsAbstract || _actionReturnType.IsInterface;
     }
 }

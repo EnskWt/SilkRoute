@@ -33,13 +33,19 @@ public interface ITestMicroservice : IMicroserviceClient
     Task<RequestSnapshot> Query_Contains_ComplexDto_And_Primitive([FromQuery] ComplexDto dto, [FromQuery] int id);
 
     [HttpGet("api/test/bind/query/contains-nullables")]
-    Task<RequestSnapshot> Query_Contains_Nullables([FromQuery] int? id, [FromQuery] string? name);
+    Task<RequestSnapshot> Query_Contains_Nullables([FromQuery] int? id, [FromQuery] string name);
 
     [HttpGet("api/test/bind/query/contains-stream")]
-    Task<RequestSnapshot> Query_Contains_Stream([FromQuery] DtoWithNestedStream dto);
+    Task<RequestSnapshot> Query_Contains_Stream([FromQuery] Stream stream);
 
     [HttpGet("api/test/bind/query/contains-bytes")]
-    Task<RequestSnapshot> Query_Contains_Bytes([FromQuery] DtoWithNestedBytes dto);
+    Task<RequestSnapshot> Query_Contains_Bytes([FromQuery] byte[] bytes);
+    
+    [HttpGet("api/test/bind/query/contains-dto-with-nested-stream")]
+    Task<RequestSnapshot> Query_Contains_DtoWithNestedStream([FromQuery] DtoWithNestedStream dto);
+
+    [HttpGet("api/test/bind/query/contains-dto-with-nested-bytes")]
+    Task<RequestSnapshot> Query_Contains_DtoWithNestedBytes([FromQuery] DtoWithNestedBytes dto);
 
     #endregion
 
@@ -54,11 +60,14 @@ public interface ITestMicroservice : IMicroserviceClient
     [HttpGet("api/test/bind/route/contains-primitive-and-has-length-constraint/{id:length(15)}")]
     Task<RequestSnapshot> Route_Contains_Primitive_And_Has_Length_Constraint([FromRoute] string id);
 
-    [HttpGet("api/test/bind/route/contains-primitive-and-has-length-constraint/{id:alpha:length(15)}")]
+    [HttpGet("api/test/bind/route/contains-primitive-and-has-length-and-alpha-constraints/{id:alpha:length(15)}")]
     Task<RequestSnapshot> Route_Contains_Primitive_And_Has_Length_And_Alpha_Constraints([FromRoute] string id);
-
+    
     [HttpGet("api/test/bind/header/contains-primitive")]
-    Task<RequestSnapshot> Header_Contains_Primitive([FromHeader(Name = "X-Test")] string value);
+    Task<RequestSnapshot> Header_Contains_Primitive([FromHeader] string value);
+
+    [HttpGet("api/test/bind/header/contains-primitive-with-name")]
+    Task<RequestSnapshot> Header_Contains_Primitive_WithName([FromHeader(Name = "X-Test")] string value);
 
     #endregion
 
@@ -111,14 +120,18 @@ public interface ITestMicroservice : IMicroserviceClient
     Task<RequestSnapshot> Form_Contains_Primitive_Collection([FromForm] List<string> values);
 
     [HttpPost("api/test/bind/form/contains-iformfile")]
-    [Consumes("multipart/form-data")]
     Task<RequestSnapshot> Form_Contains_IFormFile(/*[FromForm]*/ IFormFile file);
 
     [HttpPost("api/test/bind/form/contains-iformfile-and-primitives")]
     Task<RequestSnapshot> Form_Contains_IFormFile_And_Primitives(/*[FromForm]*/ IFormFile file, [FromForm] string comment);
 
-    [HttpPost("api/test/bind/form/contains-iformfiles")]
-    Task<RequestSnapshot> Form_Contains_IFormFiles([FromForm] List<IFormFile> files);
+    [HttpPost("api/test/bind/form/contains-iformfile-collection")]
+    Task<RequestSnapshot> Form_Contains_IFormFile_Collection([FromForm] List<IFormFile> files);
+    
+    [HttpPost("api/test/bind/form/contains-iformfile-and-primitive-dictionary")]
+    Task<RequestSnapshot> Form_Contains_IFormFile_And_Primitive_Dictionary(
+        /*[FromForm]*/ IFormFile file,
+        [FromForm] Dictionary<string, string> values);
     
     [HttpPost("api/test/bind/form/contains-iformfilecollection")]
     Task<RequestSnapshot> Form_Contains_IFormFileCollection([FromForm] IFormFileCollection files);
@@ -126,6 +139,9 @@ public interface ITestMicroservice : IMicroserviceClient
     [HttpPost("api/test/bind/form/contains-iformfilecollection-and-primitives")]
     Task<RequestSnapshot> Form_Contains_IFormFileCollection_And_Primitives([FromForm] IFormFileCollection files, [FromForm] string comment);
 
+    [HttpPost("api/test/bind/form/contains-dto-with-nested-formdata")]
+    Task<RequestSnapshot> Form_Contains_DtoWithNestedFormData([FromForm] DtoWithNestedFormData dto);
+    
     #endregion
 
     #region Body and Form combining
@@ -134,7 +150,7 @@ public interface ITestMicroservice : IMicroserviceClient
     Task<RequestSnapshot> BodyComplexDto_And_FormPrimitive([FromBody] ComplexDto dto, [FromForm] string formValue);
 
     [HttpPost("api/test/bind/invalid/body-complexdto-and-iformfile")]
-    Task<RequestSnapshot> BodyComplexDto_And_IFormFile([FromBody] ComplexDto dto, IFormFile file);
+    Task<RequestSnapshot> BodyComplexDto_And_IFormFile([FromBody] ComplexDto dto, /*[FromForm]*/ IFormFile file);
 
     #endregion
 
@@ -245,12 +261,6 @@ public interface ITestMicroservice : IMicroserviceClient
 
     [HttpGet("api/test/return/domain/stream")]
     Stream Domain_Stream();
-    
-    [HttpGet("api/test/return/domain/iformfile")]
-    IFormFile Domain_IFormFile();
-
-    [HttpGet("api/test/return/domain/iformfilecollection")]
-    IFormFileCollection Domain_IFormFileCollection();
 
     [HttpGet("api/test/return/domain/task")]
     Task Domain_Task();

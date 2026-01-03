@@ -20,10 +20,18 @@ public sealed class ClientController : ControllerBase
     [HttpGet("api/test/bind/query/test-contains-primitives")]
     public async Task<IActionResult> Test_Query_Contains_Primitives([FromQuery] int id, [FromQuery] bool flag, [FromQuery] string name)
         => Ok(await _testMicroservice.Query_Contains_Primitives(id, flag, name));
+    
+    [HttpGet("api/test/bind/query/test-contains-primitive-with-name")]
+    public async Task<IActionResult> Test_Query_Contains_Primitive_WithName([FromQuery(Name = "q")] string query)
+        => Ok(await _testMicroservice.Query_Contains_Primitive_WithName(query));
 
     [HttpGet("api/test/bind/query/test-contains-primitive-collections")]
     public async Task<IActionResult> Test_Query_Contains_Primitive_Collections([FromQuery] int[] ids, [FromQuery] List<string> tags)
         => Ok(await _testMicroservice.Query_Contains_Primitive_Collections(ids, tags));
+    
+    [HttpGet("api/test/bind/query/test-contains-primitive-dictionary")]
+    public async Task<IActionResult> Test_Query_Contains_Primitive_Dictionary([FromQuery] Dictionary<string, string> values)
+        => Ok(await _testMicroservice.Query_Contains_Primitive_Dictionary(values));
 
     [HttpGet("api/test/bind/query/test-contains-complexdto")]
     public async Task<IActionResult> Test_Query_Contains_ComplexDto([FromQuery] ComplexDto dto)
@@ -38,28 +46,52 @@ public sealed class ClientController : ControllerBase
         => Ok(await _testMicroservice.Query_Contains_ComplexDto_And_Primitive(dto, id));
 
     [HttpGet("api/test/bind/query/test-contains-nullables")]
-    public async Task<IActionResult> Test_Query_Contains_Nullables([FromQuery] int? id, [FromQuery] string? name)
+    public async Task<IActionResult> Test_Query_Contains_Nullables([FromQuery] int? id, [FromQuery] string name)
         => Ok(await _testMicroservice.Query_Contains_Nullables(id, name));
 
-    [HttpGet("api/test/bind/query/test-contains-stream")] // TO TEST
-    public async Task<IActionResult> Test_Query_Contains_Stream([FromQuery] DtoWithNestedStream dto)
-        => Ok(await _testMicroservice.Query_Contains_Stream(dto));
+    [HttpPost("api/test/bind/query/test-contains-stream")]
+    public async Task<IActionResult> Test_Query_Contains_Stream(Stream stream)
+        => Ok(await _testMicroservice.Query_Contains_Stream(stream));
 
-    [HttpGet("api/test/bind/query/test-contains-bytes")] // TO TEST
-    public async Task<IActionResult> Test_Query_Contains_Bytes([FromQuery] DtoWithNestedBytes dto)
-        => Ok(await _testMicroservice.Query_Contains_Bytes(dto));
+    [HttpPost("api/test/bind/query/test-contains-bytes")]
+    public async Task<IActionResult> Test_Query_Contains_Bytes(byte[] bytes)
+        => Ok(await _testMicroservice.Query_Contains_Bytes(bytes));
+    
+    [HttpPost("api/test/bind/query/test-contains-dto-with-nested-stream")]
+    public async Task<IActionResult> Test_Query_Contains_DtoWithNestedStream(Stream stream)
+        => Ok(await _testMicroservice.Query_Contains_DtoWithNestedStream(new DtoWithNestedStream(0, "test", stream)));
+
+    [HttpPost("api/test/bind/query/test-contains-dto-with-nested-bytes")]
+    public async Task<IActionResult> Test_Query_Contains_DtoWithNestedBytes(byte[] bytes)
+        => Ok(await _testMicroservice.Query_Contains_DtoWithNestedBytes(new DtoWithNestedBytes(0, "test", bytes)));
 
     #endregion
 
     #region Route and Header
+    
+    [HttpGet("api/test/bind/route/test-contains-primitives/{id}/{name}")]
+    public async Task<IActionResult> Test_Route_Contains_Primitives([FromRoute] int id, [FromRoute] string name)
+        => Ok(await _testMicroservice.Route_Contains_Primitives(id, name));
 
-    [HttpGet("api/test/bind/route/test-contains-primitive/{id:int}")]
-    public async Task<IActionResult> Test_Route_Contains_Primitive([FromRoute] int id)
-        => Ok(await _testMicroservice.Route_Contains_Primitive(id));
+    [HttpGet("api/test/bind/route/test-contains-primitive-with-name/{id}")]
+    public async Task<IActionResult> Test_Route_Contains_Primitive_WithName([FromRoute(Name = "id")] int routeId)
+        => Ok(await _testMicroservice.Route_Contains_Primitive_WithName(routeId));
 
+    [HttpGet("api/test/bind/route/test-contains-primitive-and-has-length-constraint/{id}")]
+    public async Task<IActionResult> Test_Route_Contains_Primitive_And_Has_Length_Constraint([FromRoute] string id)
+        => Ok(await _testMicroservice.Route_Contains_Primitive_And_Has_Length_Constraint(id));
+
+    [HttpGet("api/test/bind/route/test-contains-primitive-and-has-length-and-alpha-constraints/{id}")]
+    public async Task<IActionResult> Test_Route_Contains_Primitive_And_Has_Length_And_Alpha_Constraints([FromRoute] string id)
+        => Ok(await _testMicroservice.Route_Contains_Primitive_And_Has_Length_And_Alpha_Constraints(id));
+    
     [HttpGet("api/test/bind/header/test-contains-primitive")]
-    public async Task<IActionResult> Test_Header_Contains_Primitive([FromHeader(Name = "X-Test")] string value)
+    public async Task<IActionResult> Test_Header_Contains_Primitive([FromHeader] string value)
         => Ok(await _testMicroservice.Header_Contains_Primitive(value));
+
+    [HttpGet("api/test/bind/header/test-contains-primitive-with-name")]
+    public async Task<IActionResult> Test_Header_Contains_Primitive_WithName([FromHeader(Name = "X-Test")] string value)
+        => Ok(await _testMicroservice.Header_Contains_Primitive_WithName(value));
 
     #endregion
 
@@ -68,6 +100,14 @@ public sealed class ClientController : ControllerBase
     [HttpPost("api/test/bind/body/test-contains-complexdto")]
     public async Task<IActionResult> Test_Body_Contains_ComplexDto([FromBody] ComplexDto dto)
         => Ok(await _testMicroservice.Body_Contains_ComplexDto(dto));
+    
+    [HttpPost("api/test/bind/body/test-contains-primitive-collection")]
+    public async Task<IActionResult> Test_Body_Contains_Primitive_Collection([FromBody] List<string> values)
+        => Ok(await _testMicroservice.Body_Contains_Primitive_Collection(values));
+
+    [HttpPost("api/test/bind/body/test-contains-primitive-dictionary")]
+    public async Task<IActionResult> Test_Body_Contains_Primitive_Dictionary([FromBody] Dictionary<string, string> values)
+        => Ok(await _testMicroservice.Body_Contains_Primitive_Dictionary(values));
 
     [HttpPost("api/test/bind/body/test-contains-primitive")]
     public async Task<IActionResult> Test_Body_Contains_Primitive([FromBody] string text)
@@ -81,17 +121,17 @@ public sealed class ClientController : ControllerBase
     public async Task<IActionResult> Test_Body_Contains_Bytes([FromBody] byte[] body)
         => Ok(await _testMicroservice.Body_Contains_Bytes(body));
 
-    [HttpPost("api/test/bind/body/test-contains-dto-with-nested-stream")] // TO TEST
-    public async Task<IActionResult> Test_Body_Contains_DtoWithNestedStream([FromBody] DtoWithNestedStream dto)
-        => Ok(await _testMicroservice.Body_Contains_DtoWithNestedStream(dto));
+    [HttpPost("api/test/bind/body/test-contains-dto-with-nested-stream")]
+    public async Task<IActionResult> Test_Body_Contains_DtoWithNestedStream([FromBody] Stream stream)
+        => Ok(await _testMicroservice.Body_Contains_DtoWithNestedStream(new DtoWithNestedStream(0, "test", stream)));
 
     [HttpPost("api/test/bind/body/test-contains-dto-with-nested-bytes")]
-    public async Task<IActionResult> Test_Body_Contains_DtoWithNestedBytes([FromBody] DtoWithNestedBytes dto)
-        => Ok(await _testMicroservice.Body_Contains_DtoWithNestedBytes(dto));
+    public async Task<IActionResult> Test_Body_Contains_DtoWithNestedBytes([FromBody] byte[] bytes)
+        => Ok(await _testMicroservice.Body_Contains_DtoWithNestedBytes(new DtoWithNestedBytes(0, "test", bytes)));
 
-    [HttpPost("api/test/bind/body/test-contains-dto-with-nested-formdata")] // TO TEST
-    public async Task<IActionResult> Test_Body_Contains_DtoWithNestedFormData([FromBody] DtoWithNestedFormData dto)
-        => Ok(await _testMicroservice.Body_Contains_DtoWithNestedFormData(dto));
+    [HttpPost("api/test/bind/body/test-contains-dto-with-nested-formdata")]
+    public async Task<IActionResult> Test_Body_Contains_DtoWithNestedFormData(IFormFile formFile)
+        => Ok(await _testMicroservice.Body_Contains_DtoWithNestedFormData(new DtoWithNestedFormData(0, "test", formFile)));
 
     //[HttpPost("api/test/bind/invalid/test-two-bodies")]
     //public async Task<IActionResult> Test_Two_Bodies([FromBody] ComplexDto a, [FromBody] ComplexDto b)
@@ -104,6 +144,18 @@ public sealed class ClientController : ControllerBase
     [HttpPost("api/test/bind/form/test-contains-primitives")]
     public async Task<IActionResult> Test_Form_Contains_Primitives([FromForm] string name, [FromForm] int id)
         => Ok(await _testMicroservice.Form_Contains_Primitives(name, id));
+    
+    [HttpPost("api/test/bind/form/test-contains-primitive-with-name")]
+    public async Task<IActionResult> Test_Form_Contains_Primitive_WithName([FromForm(Name = "comment")] string text)
+        => Ok(await _testMicroservice.Form_Contains_Primitive_WithName(text));
+
+    [HttpPost("api/test/bind/form/test-contains-primitive-dictionary")]
+    public async Task<IActionResult> Test_Form_Contains_Primitive_Dictionary([FromForm] Dictionary<string, string> values)
+        => Ok(await _testMicroservice.Form_Contains_Primitive_Dictionary(values));
+
+    [HttpPost("api/test/bind/form/test-contains-primitive-collection")]
+    public async Task<IActionResult> Test_Form_Contains_Primitive_Collection([FromForm] List<string> values)
+        => Ok(await _testMicroservice.Form_Contains_Primitive_Collection(values));
 
     [HttpPost("api/test/bind/form/test-contains-iformfile")]
     public async Task<IActionResult> Test_Form_Contains_IFormFile(/*[FromForm]*/ IFormFile file)
@@ -113,21 +165,39 @@ public sealed class ClientController : ControllerBase
     public async Task<IActionResult> Test_Form_Contains_IFormFile_And_Primitives(/*[FromForm]*/ IFormFile file, [FromForm] string comment)
         => Ok(await _testMicroservice.Form_Contains_IFormFile_And_Primitives(file, comment));
 
-    [HttpPost("api/test/bind/form/test-contains-iformfiles")]
-    public async Task<IActionResult> Test_Form_Contains_IFormFiles([FromForm] List<IFormFile> files)
-        => Ok(await _testMicroservice.Form_Contains_IFormFiles(files));
+    [HttpPost("api/test/bind/form/test-contains-iformfile-collection")]
+    public async Task<IActionResult> Test_Form_Contains_IFormFile_Collection([FromForm] List<IFormFile> files)
+        => Ok(await _testMicroservice.Form_Contains_IFormFile_Collection(files));
+    
+    [HttpPost("api/test/bind/form/test-contains-iformfile-and-primitive-dictionary")]
+    public async Task<IActionResult> Test_Form_Contains_IFormFile_And_Primitive_Dictionary(
+        /*[FromForm]*/ IFormFile file,
+        [FromForm] Dictionary<string, string> values)
+        => Ok(await _testMicroservice.Form_Contains_IFormFile_And_Primitive_Dictionary(file, values));
+    
+    [HttpPost("api/test/bind/form/test-contains-iformfilecollection")]
+    public async Task<IActionResult> Test_Form_Contains_IFormFileCollection([FromForm] IFormFileCollection files)
+        => Ok(await _testMicroservice.Form_Contains_IFormFileCollection(files));
+
+    [HttpPost("api/test/bind/form/test-contains-iformfilecollection-and-primitives")]
+    public async Task<IActionResult> Test_Form_Contains_IFormFileCollection_And_Primitives([FromForm] IFormFileCollection files, [FromForm] string comment)
+        => Ok(await _testMicroservice.Form_Contains_IFormFileCollection_And_Primitives(files, comment));
+    
+    [HttpPost("api/test/bind/form/test-contains-dto-with-nested-formdata")]
+    public async Task<IActionResult> Test_Form_Contains_DtoWithNestedFormData([FromForm] DtoWithNestedFormData dto)
+        => Ok(await _testMicroservice.Form_Contains_DtoWithNestedFormData(dto));
 
     #endregion
 
     #region Body and Form combining
 
     [HttpPost("api/test/bind/invalid/test-body-complexdto-and-form-primitive")]
-    public async Task<IActionResult> Test_BodyComplexDto_And_FormPrimitive([FromBody] ComplexDto dto, [FromForm] string formValue) // TO TEST
-        => Ok(await _testMicroservice.BodyComplexDto_And_FormPrimitive(dto, formValue));
+    public async Task<IActionResult> Test_BodyComplexDto_And_FormPrimitive([FromBody] ComplexDto dto)
+        => Ok(await _testMicroservice.BodyComplexDto_And_FormPrimitive(dto, "test"));
 
     [HttpPost("api/test/bind/invalid/test-body-complexdto-and-iformfile")]
-    public async Task<IActionResult> Test_BodyComplexDto_And_IFormFile([FromBody] ComplexDto dto, IFormFile file) // TO TEST
-        => Ok(await _testMicroservice.BodyComplexDto_And_IFormFile(dto, file));
+    public async Task<IActionResult> Test_BodyComplexDto_And_IFormFile(IFormFile file)
+        => Ok(await _testMicroservice.BodyComplexDto_And_IFormFile(new ComplexDto(0, "test"), file));
 
     #endregion
 
@@ -188,6 +258,14 @@ public sealed class ClientController : ControllerBase
     [HttpPost("api/test/bind/allattrs/test-form-primitive-and-header-primitive")]
     public async Task<IActionResult> Test_AllAttrs_FormPrimitive_And_HeaderPrimitive([FromForm] string comment, [FromHeader(Name = "X-Trace")] string traceId)
         => Ok(await _testMicroservice.AllAttrs_FormPrimitive_And_HeaderPrimitive(comment, traceId));
+    
+    [HttpPost("api/test/bind/allattrs/test-route-primitive-and-query-primitive-and-header-primitive-and-form-primitive-with-names/{id:int}")]
+    public async Task<IActionResult> Test_AllAttrs_RoutePrimitive_And_QueryPrimitive_And_HeaderPrimitive_And_FormPrimitive_WithNames(
+        [FromRoute(Name = "id")] int routeId,
+        [FromQuery(Name = "q")] string query,
+        [FromHeader(Name = "X-Trace")] string traceId,
+        [FromForm(Name = "comment")] string comment)
+        => Ok(await _testMicroservice.AllAttrs_RoutePrimitive_And_QueryPrimitive_And_HeaderPrimitive_And_FormPrimitive_WithNames(routeId, query, traceId, comment));
 
     #endregion
 
@@ -342,10 +420,24 @@ public sealed class ClientController : ControllerBase
     [Produces("application/json")]
     public ObjectResult Test_ObjectResult_ComplexDto()
         => _testMicroservice.ObjectResult_ComplexDto();
+    
+    [HttpGet("api/test/return/concrete-actionresult/test-okobjectresult-complexdto")]
+    [Produces("application/json")]
+    public OkObjectResult Test_OkObjectResult_ComplexDto()
+        => _testMicroservice.OkObjectResult_ComplexDto();
+    
+    [HttpGet("api/test/return/concrete-actionresult/test-jsonresult-complexdto")]
+    [Produces("application/json")]
+    public JsonResult Test_JsonResult_ComplexDto()
+        => _testMicroservice.JsonResult_ComplexDto();
 
     [HttpGet("api/test/return/concrete-actionresult/test-statuscoderesult-418")]
     public StatusCodeResult Test_StatusCodeResult_418()
         => _testMicroservice.StatusCodeResult_418();
+    
+    [HttpGet("api/test/return/concrete-actionresult/test-okresult-200")]
+    public OkResult Test_OkResult_200()
+        => _testMicroservice.OkResult_200();
 
     [HttpGet("api/test/return/concrete-actionresult/test-filecontentresult-bytes")]
     public FileContentResult Test_FileContentResult_Bytes()

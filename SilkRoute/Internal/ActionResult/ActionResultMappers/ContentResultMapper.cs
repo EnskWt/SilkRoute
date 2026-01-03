@@ -7,9 +7,9 @@ internal sealed class ContentResultMapper : IActionResultMapper
 {
     public int Priority => 30;
 
-    public bool CanMap(object? payload) => payload is string;
+    public bool CanMap(object payload) => payload is string;
 
-    public object Map(HttpResponseMessage response, object? payload)
+    public object Map(HttpResponseMessage response, object payload)
     {
         var contentType = response.Content.Headers.ContentType?.ToString() ?? "text/plain";
 

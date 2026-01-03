@@ -1,4 +1,5 @@
 ﻿using System.Dynamic;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using SilkRoute.Internal.Abstractions.ActionReturn;
@@ -10,25 +11,19 @@ namespace SilkRoute.Internal.HttpResponse.HttpResponseContentReaders;
 
 internal sealed class JsonContentReader : IHttpResponseContentReader
 {
+    public int Priority => int.MaxValue;
+    
     public bool CanRead(HttpResponseMessage responseMessage, IActionReturnDescriptor descriptor)
     {
-        if (descriptor.ActionReturnTypeMatchesJson())
+        if (descriptor.ActionReturnTypeIsAbstractOrInterface())
         {
-            return true;
+            return false;
         }
 
-        if (descriptor.GetActionReturnType().IsAbstractActionResultType())
-        {
-            if (responseMessage.IsJsonMediaType())
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return responseMessage.IsJsonMediaType();
     }
 
-    public async Task<object?> ReadAsync(
+    public async Task<object> ReadAsync(
         HttpResponseMessage response,
         IActionReturnDescriptor descriptor)
     {
@@ -54,7 +49,7 @@ internal sealed class JsonContentReader : IHttpResponseContentReader
             targetType = typeof(ExpandoObject);
         }
 
-        JsonSerializerSettings? settings = null;
+        JsonSerializerSettings settings = null;
         if (targetType == typeof(ExpandoObject))
         {
             settings = new JsonSerializerSettings

@@ -24,9 +24,9 @@ internal class HttpRequestBuilder
     private readonly HttpMethod _httpMethod;
     private readonly string _uriTemplate;
     private readonly ParameterInfo[] _parameterInfos;
-    private readonly object?[]? _parameterValues;
+    private readonly object[] _parameterValues;
 
-    internal HttpRequestBuilder(HttpMethod method, string uriTemplate, ParameterInfo[] parameterInfos, object?[]? parameterValues)
+    internal HttpRequestBuilder(HttpMethod method, string uriTemplate, ParameterInfo[] parameterInfos, object[] parameterValues)
     {
         _httpMethod = method;
         _uriTemplate = uriTemplate;
@@ -56,7 +56,7 @@ internal class HttpRequestBuilder
         if (ExplicitBody.HasValue && FormParams.Count > 0)
         {
             throw new InvalidOperationException(
-                "SilkRoute doesn't support using both [FromBody] and [FromForm] attributes in one request.");
+                "Using both [FromBody] and [FromForm] attributes in one request is not supported.");
         }
 
         if (ExplicitBody?.Value != null && ExplicitBody.Value.Value.ContainsNonExplicitFormData())
@@ -96,7 +96,7 @@ internal class HttpRequestBuilder
             if (nonExplicitBodyParams.Any() && nonExplicitFormParams.Any())
             {
                 throw new InvalidOperationException(
-                    "SilkRoute doesn't support mixing attributeless form-data parameters with attributeless complex-object parameters in the same request. " +
+                    "Mixing attributeless form-data parameters with attributeless complex-object parameters in the same request is not supported. " +
                     "Please annotate from-data parameters with [FromForm] or complex object parameters with [FromBody].");
             }
         }
@@ -144,7 +144,11 @@ internal class HttpRequestBuilder
             var parameter = _parameterInfos[i];
             var value = _parameterValues != null && i < _parameterValues.Length ? _parameterValues[i] : null;
 
-            if (value == null) continue;
+            if (value == null)
+            {
+                continue;
+            }
+            
             foreach (var binder in _parameterBinders)
             {
                 if (binder.CanBind(parameter, value))
@@ -162,9 +166,9 @@ internal class HttpRequestBuilder
         BindParametersByAttribute();
     }
 
-    internal (string method, string uri, HttpContent? content, IDictionary<string, string> headers) BuildRequest()
+    internal (string method, string uri, HttpContent content, IDictionary<string, string> headers) BuildRequest()
     {
-        HttpContent? content = null;
+        HttpContent content = null;
 
         foreach (var binder in _contentBuilders)
         {

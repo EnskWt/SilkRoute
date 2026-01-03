@@ -20,7 +20,7 @@ internal sealed class ContentResultWrapper : IActionResultWrapper
     public object Wrap(
         HttpResponseMessage response,
         IActionReturnDescriptor actionReturnDescriptor,
-        object? actionReturnValue)
+        object actionReturnValue)
     {
         if (response is null)
         {

@@ -13,13 +13,14 @@ internal sealed class FormParameterContentBuilder : IHttpRequestContentBuilder
     {
         var partWriters = new List<IHttpRequestFormDataPartWriter>
         {
-            new SingleFileFormDataPartWriter(),
-            new MultipleFilesFormDataPartWriter(),
-            new SimpleScalarContentFormDataPartWriter(),
-            new EnumerableContentFormDataPartWriter(),
-            new ComplexContentFormDataPartWriter()
-        };
-        
+            new SingleFileFormDataPartWriter(),          
+            new MultipleFilesFormDataPartWriter(),       
+            new SimpleScalarContentFormDataPartWriter(), 
+            new DictionaryContentFormDataPartWriter(),   
+            new EnumerableContentFormDataPartWriter(),   
+            new ComplexContentFormDataPartWriter()       
+        }.OrderBy(x => x.Priority).ToList();
+
         _formContext = new HttpRequestFormDataPartWriterContext(partWriters);
     }
 
@@ -48,6 +49,17 @@ internal sealed class FormParameterContentBuilder : IHttpRequestContentBuilder
         {
             httpRequestBuilder.FormParams.Add(p);
             httpRequestBuilder.NoAttributeParams.Remove(p);
+        }
+        
+        foreach (var (name, value) in httpRequestBuilder.FormParams)
+        {
+            if (value.ContainsStream() || value.ContainsByteArray())
+            {
+                throw new InvalidOperationException(
+                    $"Form parameter '{name}' of type '{value.GetType().Name}' cannot be sent as multipart field. " +
+                    "Use top-level [FromBody] Stream/byte[] for raw body, " +
+                    "or use multipart with top-level IFormFile / IEnumerable<IFormFile> / IFormFileCollection.");
+            }
         }
 
         var form = new MultipartFormDataContent();

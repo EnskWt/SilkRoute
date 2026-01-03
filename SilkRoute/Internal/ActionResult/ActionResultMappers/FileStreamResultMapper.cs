@@ -7,9 +7,9 @@ internal sealed class FileStreamResultMapper : IActionResultMapper
 {
     public int Priority => 20;
 
-    public bool CanMap(object? payload) => payload is Stream;
+    public bool CanMap(object payload) => payload is Stream;
 
-    public object Map(HttpResponseMessage response, object? payload)
+    public object Map(HttpResponseMessage response, object payload)
     {
         var stream = (Stream)payload!;
         var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";

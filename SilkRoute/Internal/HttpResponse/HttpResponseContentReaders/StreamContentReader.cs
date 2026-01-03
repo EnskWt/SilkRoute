@@ -7,23 +7,30 @@ namespace SilkRoute.Internal.HttpResponse.HttpResponseContentReaders;
 
 internal sealed class StreamContentReader : IHttpResponseContentReader
 {
+    public int Priority => 10;
+    
     public bool CanRead(HttpResponseMessage responseMessage, IActionReturnDescriptor descriptor)
     {
         if (descriptor.ActionReturnTypeMatchesStream())
         {
+            if ((responseMessage.HasMediaType() && !responseMessage.IsFileMediaType()) && !responseMessage.HasContentDisposition())
+            {
+                return false;
+            }
+            
             return true;
         }
 
         if (descriptor.GetActionReturnType().IsAbstractActionResultType())
         {
-            return responseMessage.HasContentDisposition()
-                   || responseMessage.IsFileMediaType();
+            return responseMessage.IsFileMediaType()
+                   || responseMessage.HasContentDisposition();
         }
 
         return false;
     }
 
-    public async Task<object?> ReadAsync(
+    public async Task<object> ReadAsync(
         HttpResponseMessage response,
         IActionReturnDescriptor descriptor)
     {

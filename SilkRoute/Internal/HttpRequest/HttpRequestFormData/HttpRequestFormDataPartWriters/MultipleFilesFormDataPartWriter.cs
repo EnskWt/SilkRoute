@@ -4,6 +4,8 @@ namespace SilkRoute.Internal.HttpRequest.HttpRequestFormData.HttpRequestFormData
 
 internal sealed class MultipleFilesFormDataPartWriter : IHttpRequestFormDataPartWriter
 {
+    public int Priority => 10;
+
     public bool CanWritePart(object value)
     {
         if (value is null)
@@ -11,7 +13,7 @@ internal sealed class MultipleFilesFormDataPartWriter : IHttpRequestFormDataPart
             throw new ArgumentNullException(nameof(value));
         }
 
-        return value is IEnumerable<IFormFile>;
+        return value is IFormFileCollection || value is IEnumerable<IFormFile>;
     }
 
     public void WritePart(
@@ -40,7 +42,9 @@ internal sealed class MultipleFilesFormDataPartWriter : IHttpRequestFormDataPart
             throw new ArgumentNullException(nameof(value));
         }
 
-        foreach (var file in (IEnumerable<IFormFile>)value)
+        var files = value as IFormFileCollection ?? (IEnumerable<IFormFile>)value;
+
+        foreach (var file in files)
         {
             context.AddPart(form, name, file);
         }

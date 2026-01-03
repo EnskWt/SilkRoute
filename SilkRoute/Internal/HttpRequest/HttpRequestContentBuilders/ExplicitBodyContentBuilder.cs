@@ -31,7 +31,7 @@ internal sealed class ExplicitBodyContentBuilder : IHttpRequestContentBuilder
         return httpRequestBuilder.ExplicitBody.HasValue;
     }
 
-    public HttpContent? Build(HttpRequestBuilder httpRequestBuilder)
+    public HttpContent Build(HttpRequestBuilder httpRequestBuilder)
     {
         if (httpRequestBuilder is null)
         {

@@ -1,12 +1,11 @@
 ﻿using System.Collections;
 using SilkRoute.Internal.Abstractions.HttpRequest;
-using SilkRoute.Internal.Extensions.Common;
 
 namespace SilkRoute.Internal.HttpRequest.HttpRequestFormData.HttpRequestFormDataPartWriters;
 
-internal sealed class EnumerableContentFormDataPartWriter : IHttpRequestFormDataPartWriter
+internal sealed class DictionaryContentFormDataPartWriter : IHttpRequestFormDataPartWriter
 {
-    public int Priority => 40;
+    public int Priority => 30;
 
     public bool CanWritePart(object value)
     {
@@ -14,8 +13,8 @@ internal sealed class EnumerableContentFormDataPartWriter : IHttpRequestFormData
         {
             throw new ArgumentNullException(nameof(value));
         }
-        
-        return value is IEnumerable and not string and not IDictionary and not IFormFileCollection and not IEnumerable<IFormFile>;
+
+        return value is IDictionary;
     }
 
     public void WritePart(
@@ -44,20 +43,23 @@ internal sealed class EnumerableContentFormDataPartWriter : IHttpRequestFormData
             throw new ArgumentNullException(nameof(value));
         }
 
-        var i = 0;
-        foreach (var item in (IEnumerable)value)
+        var dict = (IDictionary)value;
+
+        foreach (DictionaryEntry entry in dict)
         {
-            if (item is null)
+            if (entry.Value is null)
             {
-                i++;
+                continue;
+            }
+
+            var key = entry.Key.ToString();
+            if (string.IsNullOrWhiteSpace(key))
+            {
                 continue;
             }
             
-            var isScalar = item is string || item.GetType().IsSimpleScalarType();
-            var itemName = isScalar ? name : $"{name}[{i}]";
-
-            context.AddPart(form, itemName, item);
-            i++;
+            var fieldName = $"{name}[{key}]";
+            context.AddPart(form, fieldName, entry.Value);
         }
     }
 }

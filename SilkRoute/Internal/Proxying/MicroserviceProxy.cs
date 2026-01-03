@@ -64,9 +64,8 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
 
         return (TResult)result!;
     }
-
     
-    private async Task<object?> Invoke(MethodInfo targetMethod, object?[] args)
+    private async Task<object> Invoke(MethodInfo targetMethod, object[] args)
     {
         EnsureValidInvocation(targetMethod);
 
@@ -85,7 +84,7 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
         return result;
     }
     
-    private void EnsureValidInvocation(MethodInfo? targetMethod)
+    private void EnsureValidInvocation(MethodInfo targetMethod)
     {
         if (_httpClient == null)
         {
@@ -108,9 +107,9 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
         }
     }
 
-    private (string method, string uri, HttpContent? content, IDictionary<string, string> headers) PrepareRequest(
+    private (string method, string uri, HttpContent content, IDictionary<string, string> headers) PrepareRequest(
         MethodInfo targetMethod,
-        object?[]? args)
+        object[] args)
     {
         var httpAttr = targetMethod.GetCustomAttributes().OfType<HttpMethodAttribute>().FirstOrDefault();
         var routeAttr = targetMethod.GetCustomAttributes().OfType<RouteAttribute>().FirstOrDefault();
@@ -134,7 +133,7 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
     private async Task<HttpResponseMessage> SendRequest(
         string method,
         string uri,
-        HttpContent? content,
+        HttpContent content,
         IDictionary<string, string> headers)
     {
         var request = new HttpRequestMessage(new HttpMethod(method), uri)
@@ -171,7 +170,7 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
         return ActionReturnDescriptorFactory.Create(resultReturnType);
     }
     
-    private Task<object?> ReadResponse(
+    private Task<object> ReadResponse(
         HttpResponseMessage response,
         IActionReturnDescriptor actionReturnDescriptor)
     {
@@ -182,7 +181,7 @@ internal class MicroserviceProxy<T> : IAsyncInterceptor
     private object BuildActionResultIfNeeded(
         HttpResponseMessage response,
         IActionReturnDescriptor actionReturnDescriptor,
-        object? actionReturnValue)
+        object actionReturnValue)
     {
         var actionReturnType = actionReturnDescriptor.GetActionReturnType();
 

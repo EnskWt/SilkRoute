@@ -7,5 +7,5 @@ internal interface IHttpRequestContentBuilder : IPrioritized
 {
     bool CanBuild(HttpRequestBuilder httpRequestBuilder);
 
-    HttpContent? Build(HttpRequestBuilder httpRequestBuilder);
+    HttpContent Build(HttpRequestBuilder httpRequestBuilder);
 }

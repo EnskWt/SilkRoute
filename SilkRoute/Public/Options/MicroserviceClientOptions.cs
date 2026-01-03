@@ -2,5 +2,5 @@
 
 public class MicroserviceClientOptions
 {
-    public Action<HttpClient>? HttpClientConfiguration { get; set; }
+    public Action<HttpClient> HttpClientConfiguration { get; set; }
 }

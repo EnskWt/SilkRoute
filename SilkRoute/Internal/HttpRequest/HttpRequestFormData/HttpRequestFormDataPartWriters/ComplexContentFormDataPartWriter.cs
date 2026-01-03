@@ -5,8 +5,12 @@ using SilkRoute.Internal.Extensions.Common;
 
 namespace SilkRoute.Internal.HttpRequest.HttpRequestFormData.HttpRequestFormDataPartWriters;
 
+using System.Reflection;
+
 internal sealed class ComplexContentFormDataPartWriter : IHttpRequestFormDataPartWriter
 {
+    public int Priority => 50;
+
     public bool CanWritePart(object value)
     {
         if (value is null)
@@ -15,8 +19,8 @@ internal sealed class ComplexContentFormDataPartWriter : IHttpRequestFormDataPar
         }
 
         return !value.GetType().IsSimpleScalarType()
-               && value is not string
-               && value is not IEnumerable;
+               && value is not IEnumerable
+               && value is not IFormFile;
     }
 
     public void WritePart(
@@ -53,11 +57,12 @@ internal sealed class ComplexContentFormDataPartWriter : IHttpRequestFormDataPar
             }
 
             var pv = prop.GetValue(value);
-
-            if (pv != null)
+            if (pv is null)
             {
-                context.AddPart(form, prop.Name, pv);
+                continue;
             }
+
+            context.AddPart(form, $"{name}.{prop.Name}", pv);
         }
     }
 }

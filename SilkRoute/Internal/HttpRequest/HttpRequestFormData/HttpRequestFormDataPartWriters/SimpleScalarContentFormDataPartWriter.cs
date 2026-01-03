@@ -1,10 +1,13 @@
-﻿using SilkRoute.Internal.Abstractions.HttpRequest;
+﻿using System.Globalization;
+using SilkRoute.Internal.Abstractions.HttpRequest;
 using SilkRoute.Internal.Extensions.Common;
 
 namespace SilkRoute.Internal.HttpRequest.HttpRequestFormData.HttpRequestFormDataPartWriters;
 
 internal sealed class SimpleScalarContentFormDataPartWriter : IHttpRequestFormDataPartWriter
 {
+    public int Priority => 20;
+
     public bool CanWritePart(object value)
     {
         if (value is null)
@@ -36,6 +39,7 @@ internal sealed class SimpleScalarContentFormDataPartWriter : IHttpRequestFormDa
             throw new ArgumentNullException(nameof(value));
         }
 
-        form.Add(new StringContent(value.ToString()!), name);
+        var str = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
+        form.Add(new StringContent(str), name);
     }
 }

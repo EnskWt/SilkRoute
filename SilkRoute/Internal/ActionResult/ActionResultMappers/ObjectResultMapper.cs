@@ -7,9 +7,9 @@ internal sealed class ObjectResultMapper : IActionResultMapper
 {
     public int Priority => int.MaxValue;
 
-    public bool CanMap(object? payload) => payload is not null;
+    public bool CanMap(object payload) => payload is not null;
 
-    public object Map(HttpResponseMessage response, object? payload)
+    public object Map(HttpResponseMessage response, object payload)
     {
         var statusCode = (int)response.StatusCode;
         var contentType = response.Content.Headers.ContentType?.ToString();

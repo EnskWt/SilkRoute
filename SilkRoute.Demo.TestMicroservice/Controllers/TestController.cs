@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SilkRoute.Demo.Shared.Contracts;
 using SilkRoute.Demo.Shared.Models;
 
@@ -15,10 +14,18 @@ public sealed class TestController : ControllerBase, ITestMicroservice
     [HttpGet("api/test/bind/query/contains-primitives")]
     public Task<RequestSnapshot> Query_Contains_Primitives([FromQuery] int id, [FromQuery] bool flag, [FromQuery] string name)
         => SnapshotAsync(new { id, flag, name });
+    
+    [HttpGet("api/test/bind/query/contains-primitive-with-name")]
+    public Task<RequestSnapshot> Query_Contains_Primitive_WithName([FromQuery(Name = "q")] string query)
+        => SnapshotAsync(new { query });
 
     [HttpGet("api/test/bind/query/contains-primitive-collections")]
     public Task<RequestSnapshot> Query_Contains_Primitive_Collections([FromQuery] int[] ids, [FromQuery] List<string> tags)
         => SnapshotAsync(new { ids, tags });
+    
+    [HttpGet("api/test/bind/query/contains-primitive-dictionary")]
+    public Task<RequestSnapshot> Query_Contains_Primitive_Dictionary([FromQuery] Dictionary<string, string> values)
+        => SnapshotAsync(new { values });
 
     [HttpGet("api/test/bind/query/contains-complexdto")]
     public Task<RequestSnapshot> Query_Contains_ComplexDto([FromQuery] ComplexDto dto)
@@ -33,16 +40,24 @@ public sealed class TestController : ControllerBase, ITestMicroservice
         => SnapshotAsync(new { dto, id });
 
     [HttpGet("api/test/bind/query/contains-nullables")]
-    public Task<RequestSnapshot> Query_Contains_Nullables([FromQuery] int? id, [FromQuery] string? name)
+    public Task<RequestSnapshot> Query_Contains_Nullables([FromQuery] int? id, [FromQuery] string name)
         => SnapshotAsync(new { id, name });
 
     [HttpGet("api/test/bind/query/contains-stream")]
-    public Task<RequestSnapshot> Query_Contains_Stream([FromQuery] DtoWithNestedStream dto)
-        => SnapshotAsync(new { dto = new { dto.Id, dto.Name, Data = "(Stream in DTO - should be blocked by client before reaching server)" } });
+    public Task<RequestSnapshot> Query_Contains_Stream([FromQuery] Stream strem)
+        => SnapshotAsync(new { Note = "(Stream or Stream in DTO - should be blocked by client before reaching server)" });
 
     [HttpGet("api/test/bind/query/contains-bytes")]
-    public Task<RequestSnapshot> Query_Contains_Bytes([FromQuery] DtoWithNestedBytes dto)
-        => SnapshotAsync(new { dto = new { dto.Id, dto.Name, DataLength = dto.Data?.Length } });
+    public Task<RequestSnapshot> Query_Contains_Bytes([FromQuery] byte[] bytes)
+        => SnapshotAsync(new { Note = "(Byte[] or Byte[] in DTO - should be blocked by client before reaching server)" });
+    
+    [HttpGet("api/test/bind/query/contains-dto-with-nested-stream")]
+    public Task<RequestSnapshot> Query_Contains_DtoWithNestedStream([FromQuery] DtoWithNestedStream dto)
+        => SnapshotAsync(new { Note = "(Stream or Stream in DTO - should be blocked by client before reaching server)" });
+
+    [HttpGet("api/test/bind/query/contains-dto-with-nested-bytes")]
+    public Task<RequestSnapshot> Query_Contains_DtoWithNestedBytes([FromQuery] DtoWithNestedBytes dto)
+        => SnapshotAsync(new { Note = "(Byte[] or Byte[] in DTO - should be blocked by client before reaching server)" });
 
     #endregion
 
@@ -51,9 +66,29 @@ public sealed class TestController : ControllerBase, ITestMicroservice
     [HttpGet("api/test/bind/route/contains-primitive/{id:int}")]
     public Task<RequestSnapshot> Route_Contains_Primitive([FromRoute] int id)
         => SnapshotAsync(new { id });
+    
+    [HttpGet("api/test/bind/route/contains-primitives/{id:int}/{name:alpha}")]
+    public Task<RequestSnapshot> Route_Contains_Primitives([FromRoute] int id, [FromRoute] string name)
+        => SnapshotAsync(new { id, name });
+
+    [HttpGet("api/test/bind/route/contains-primitive-with-name/{id:int}")]
+    public Task<RequestSnapshot> Route_Contains_Primitive_WithName([FromRoute(Name = "id")] int routeId)
+        => SnapshotAsync(new { routeId });
+
+    [HttpGet("api/test/bind/route/contains-primitive-and-has-length-constraint/{id:length(15)}")]
+    public Task<RequestSnapshot> Route_Contains_Primitive_And_Has_Length_Constraint([FromRoute] string id)
+        => SnapshotAsync(new { id });
+
+    [HttpGet("api/test/bind/route/contains-primitive-and-has-length-and-alpha-constraints/{id:alpha:length(15)}")]
+    public Task<RequestSnapshot> Route_Contains_Primitive_And_Has_Length_And_Alpha_Constraints([FromRoute] string id)
+        => SnapshotAsync(new { id });
 
     [HttpGet("api/test/bind/header/contains-primitive")]
-    public Task<RequestSnapshot> Header_Contains_Primitive([FromHeader(Name = "X-Test")] string value)
+    public Task<RequestSnapshot> Header_Contains_Primitive([FromHeader] string value)
+        => SnapshotAsync(new { header = new { value } });
+    
+    [HttpGet("api/test/bind/header/contains-primitive-with-name")]
+    public Task<RequestSnapshot> Header_Contains_Primitive_WithName([FromHeader(Name = "X-Test")] string value)
         => SnapshotAsync(new { header = new { X_Test = value } });
 
     #endregion
@@ -63,6 +98,14 @@ public sealed class TestController : ControllerBase, ITestMicroservice
     [HttpPost("api/test/bind/body/contains-complexdto")]
     public Task<RequestSnapshot> Body_Contains_ComplexDto([FromBody] ComplexDto dto)
         => SnapshotAsync(parameters: new { dto }, bodyValue: dto);
+    
+    [HttpPost("api/test/bind/body/contains-primitive-collection")]
+    public Task<RequestSnapshot> Body_Contains_Primitive_Collection([FromBody] List<string> values)
+        => SnapshotAsync(parameters: new { values }, bodyValue: values);
+
+    [HttpPost("api/test/bind/body/contains-primitive-dictionary")]
+    public Task<RequestSnapshot> Body_Contains_Primitive_Dictionary([FromBody] Dictionary<string, string> values)
+        => SnapshotAsync(parameters: new { values }, bodyValue: values);
 
     [HttpPost("api/test/bind/body/contains-primitive")]
     public Task<RequestSnapshot> Body_Contains_Primitive([FromBody] string text)
@@ -99,6 +142,18 @@ public sealed class TestController : ControllerBase, ITestMicroservice
     [HttpPost("api/test/bind/form/contains-primitives")]
     public Task<RequestSnapshot> Form_Contains_Primitives([FromForm] string name, [FromForm] int id)
         => SnapshotAsync(parameters: new { name, id }, includeForm: true);
+    
+    [HttpPost("api/test/bind/form/contains-primitive-with-name")]
+    public Task<RequestSnapshot> Form_Contains_Primitive_WithName([FromForm(Name = "comment")] string text)
+        => SnapshotAsync(parameters: new { text }, includeForm: true);
+
+    [HttpPost("api/test/bind/form/contains-primitive-dictionary")]
+    public Task<RequestSnapshot> Form_Contains_Primitive_Dictionary([FromForm] Dictionary<string, string> values)
+        => SnapshotAsync(parameters: new { values }, includeForm: true);
+
+    [HttpPost("api/test/bind/form/contains-primitive-collection")]
+    public Task<RequestSnapshot> Form_Contains_Primitive_Collection([FromForm] List<string> values)
+        => SnapshotAsync(parameters: new { values }, includeForm: true);
 
     [HttpPost("api/test/bind/form/contains-iformfile")]
     [Consumes("multipart/form-data")]
@@ -109,12 +164,53 @@ public sealed class TestController : ControllerBase, ITestMicroservice
     public Task<RequestSnapshot> Form_Contains_IFormFile_And_Primitives(/*[FromForm]*/ IFormFile file, [FromForm] string comment)
         => SnapshotAsync(parameters: new { comment, file = new { file?.Name, file?.FileName, file?.ContentType, file?.Length } }, includeForm: true);
 
-    [HttpPost("api/test/bind/form/contains-iformfiles")]
-    public Task<RequestSnapshot> Form_Contains_IFormFiles([FromForm] List<IFormFile> files)
+    [HttpPost("api/test/bind/form/contains-iformfile-collection")]
+    public Task<RequestSnapshot> Form_Contains_IFormFile_Collection([FromForm] List<IFormFile> files)
         => SnapshotAsync(parameters: new
         {
             files = files?.Select(f => new { f.Name, f.FileName, f.ContentType, f.Length }).ToList()
         }, includeForm: true);
+    
+    [HttpPost("api/test/bind/form/contains-iformfile-and-primitive-dictionary")]
+    public Task<RequestSnapshot> Form_Contains_IFormFile_And_Primitive_Dictionary(
+        /*[FromForm]*/ IFormFile file,
+        [FromForm] Dictionary<string, string> values)
+        => SnapshotAsync(
+            parameters: new
+            {
+                values,
+                file = new { file?.Name, file?.FileName, file?.ContentType, file?.Length }
+            },
+            includeForm: true);
+    
+    [HttpPost("api/test/bind/form/contains-iformfilecollection")]
+    public Task<RequestSnapshot> Form_Contains_IFormFileCollection([FromForm] IFormFileCollection files)
+        => SnapshotAsync(parameters: new
+        {
+            files = files?.Select(f => new { f.Name, f.FileName, f.ContentType, f.Length }).ToList()
+        }, includeForm: true);
+
+    [HttpPost("api/test/bind/form/contains-iformfilecollection-and-primitives")]
+    public Task<RequestSnapshot> Form_Contains_IFormFileCollection_And_Primitives([FromForm] IFormFileCollection files, [FromForm] string comment)
+        => SnapshotAsync(parameters: new
+        {
+            comment,
+            files = files?.Select(f => new { f.Name, f.FileName, f.ContentType, f.Length }).ToList()
+        }, includeForm: true);
+    
+    [HttpPost("api/test/bind/form/contains-dto-with-nested-formdata")]
+    public Task<RequestSnapshot> Form_Contains_DtoWithNestedFormData([FromForm] DtoWithNestedFormData dto)
+        => SnapshotAsync(
+            parameters: new
+            {
+                dto = new
+                {
+                    dto.Id,
+                    dto.Name,
+                    file = new { dto.File?.Name, dto.File?.FileName, dto.File?.ContentType, dto.File?.Length }
+                }
+            },
+            includeForm: true);
 
     #endregion
 
@@ -187,6 +283,14 @@ public sealed class TestController : ControllerBase, ITestMicroservice
     [HttpPost("api/test/bind/allattrs/form-primitive-and-header-primitive")]
     public Task<RequestSnapshot> AllAttrs_FormPrimitive_And_HeaderPrimitive([FromForm] string comment, [FromHeader(Name = "X-Trace")] string traceId)
         => SnapshotAsync(parameters: new { comment, traceId }, includeForm: true);
+    
+    [HttpPost("api/test/bind/allattrs/route-primitive-and-query-primitive-and-header-primitive-and-form-primitive-with-names/{id:int}")]
+    public Task<RequestSnapshot> AllAttrs_RoutePrimitive_And_QueryPrimitive_And_HeaderPrimitive_And_FormPrimitive_WithNames(
+        [FromRoute(Name = "id")] int routeId,
+        [FromQuery(Name = "q")] string query,
+        [FromHeader(Name = "X-Trace")] string traceId,
+        [FromForm(Name = "comment")] string comment)
+        => SnapshotAsync(parameters: new { routeId, query, traceId, comment }, includeForm: true);
 
     #endregion
 
@@ -299,10 +403,22 @@ public sealed class TestController : ControllerBase, ITestMicroservice
     [HttpGet("api/test/return/concrete-actionresult/objectresult-complexdto")]
     public ObjectResult ObjectResult_ComplexDto()
         => new ObjectResult(new ComplexDto(4, "objectresult")) { StatusCode = 200 };
+    
+    [HttpGet("api/test/return/concrete-actionresult/okobjectresult-complexdto")]
+    public OkObjectResult OkObjectResult_ComplexDto()
+        => new OkObjectResult(new ComplexDto(4, "okobjectresult"));
+
+    [HttpGet("api/test/return/concrete-actionresult/jsonresult-complexdto")]
+    public JsonResult JsonResult_ComplexDto()
+        => new JsonResult(new ComplexDto(4, "jsonresult"));
 
     [HttpGet("api/test/return/concrete-actionresult/statuscoderesult-418")]
     public StatusCodeResult StatusCodeResult_418()
         => new StatusCodeResult(418);
+    
+    [HttpGet("api/test/return/concrete-actionresult/okresult-200")]
+    public OkResult OkResult_200()
+        => new OkResult();
 
     [HttpGet("api/test/return/concrete-actionresult/filecontentresult-bytes")]
     public FileContentResult FileContentResult_Bytes()
@@ -365,32 +481,31 @@ public sealed class TestController : ControllerBase, ITestMicroservice
     #endregion
 
 
-    #region Request snapshot helper
+    #region Helpers
 
-    private async Task<RequestSnapshot> SnapshotAsync(object? parameters, object? bodyValue = null, bool includeForm = false)
+    private async Task<RequestSnapshot> SnapshotAsync(object parameters = null, object bodyValue = null, bool includeForm = false)
     {
         var baseSnapshot = CreateBaseSnapshot();
 
-        RequestSnapshot.BodySnapshot? body = null;
+        RequestSnapshot.BodySnapshot bodySnapshot = null;
         if (bodyValue != null)
         {
-            body = await CreateBodySnapshotFromValueAsync(bodyValue);
-        }
-        else if (parameters != null)
-        {
-            body = new RequestSnapshot.BodySnapshot
-            {
-                ContentType = Request.ContentType,
-                Length = Request.ContentLength,
-                Kind = "parameters",
-                Text = RequestSnapshot.ToJson(parameters)
-            };
+            bodySnapshot = await CreateBodySnapshotFromValueAsync(bodyValue);
         }
 
-        RequestSnapshot.FormSnapshot? form = null;
+        RequestSnapshot.FormSnapshot formSnapshot = null;
         if (includeForm)
         {
-            form = await TryCreateFormSnapshotAsync();
+            formSnapshot = await TryCreateFormSnapshotAsync();
+        }
+        
+        RequestSnapshot.ParametersSnapshot parametersSnapshot = null;
+        if (parameters != null)
+        {
+            parametersSnapshot = new RequestSnapshot.ParametersSnapshot
+            {
+                Value = parameters
+            };
         }
 
         return new RequestSnapshot
@@ -402,8 +517,9 @@ public sealed class TestController : ControllerBase, ITestMicroservice
             RouteValues = baseSnapshot.RouteValues,
             Query = baseSnapshot.Query,
             Headers = baseSnapshot.Headers,
-            Body = body,
-            Form = form
+            Body = bodySnapshot,
+            Form = formSnapshot,
+            Parameters = parametersSnapshot,
         };
     }
 
@@ -412,19 +528,21 @@ public sealed class TestController : ControllerBase, ITestMicroservice
         var endpoint = HttpContext.GetEndpoint();
         var routeEndpoint = endpoint as RouteEndpoint;
 
-        var routeValues = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+        var routeValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var kv in RouteData.Values)
             routeValues[kv.Key] = kv.Value?.ToString();
 
-        var query = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+        var query = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var kv in Request.Query)
             query[kv.Key] = kv.Value.ToString();
 
-        var headers = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var kv in Request.Headers)
         {
             if (kv.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
+            {
                 continue;
+            }
 
             headers[kv.Key] = kv.Value.ToString();
         }
@@ -454,7 +572,7 @@ public sealed class TestController : ControllerBase, ITestMicroservice
                     ContentType = ct,
                     Length = len,
                     Kind = "string",
-                    Text = s
+                    Value = s
                 };
 
             case byte[] bytes:
@@ -489,15 +607,17 @@ public sealed class TestController : ControllerBase, ITestMicroservice
                     ContentType = ct,
                     Length = len,
                     Kind = "json",
-                    Text = RequestSnapshot.ToJson(bodyValue)
+                    Value = bodyValue
                 };
         }
     }
 
-    private async Task<RequestSnapshot.FormSnapshot?> TryCreateFormSnapshotAsync()
+    private async Task<RequestSnapshot.FormSnapshot> TryCreateFormSnapshotAsync()
     {
         if (!Request.HasFormContentType)
+        {
             return null;
+        }
 
         IFormCollection form;
         try
@@ -509,7 +629,7 @@ public sealed class TestController : ControllerBase, ITestMicroservice
             return null;
         }
 
-        var fields = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+        var fields = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var kv in form)
             fields[kv.Key] = kv.Value.ToString();
 
@@ -531,6 +651,18 @@ public sealed class TestController : ControllerBase, ITestMicroservice
             Files = files
         };
     }
+    
+    private static IFormFile CreateTestFormFile()
+    {
+        var bytes = ReadTestPdfBytes();
+        var ms = new MemoryStream(bytes);
+
+        return new FormFile(ms, 0, bytes.Length, "file", "test.pdf")
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "application/pdf"
+        };
+    }
 
     private static string GetTestPdfPath()
     {
@@ -542,7 +674,9 @@ public sealed class TestController : ControllerBase, ITestMicroservice
     {
         var path = GetTestPdfPath();
         if (!System.IO.File.Exists(path))
+        {
             throw new FileNotFoundException($"File not found: {path}");
+        }
 
         return System.IO.File.ReadAllBytes(path);
     }
@@ -551,7 +685,9 @@ public sealed class TestController : ControllerBase, ITestMicroservice
     {
         var path = GetTestPdfPath();
         if (!System.IO.File.Exists(path))
+        {
             throw new FileNotFoundException($"File not found: {path}");
+        }
 
         return System.IO.File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
     }

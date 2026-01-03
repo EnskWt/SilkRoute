@@ -5,7 +5,7 @@ namespace SilkRoute.Internal.Extensions.Common;
 
 internal static class ObjectExtensions
 {
-    public static bool ContainsType<T>(this object? value, bool includeTopLevel = true) where T : class
+    public static bool ContainsType<T>(this object value, bool includeTopLevel = true) where T : class
     {
         if (value is null)
         {
@@ -54,7 +54,7 @@ internal static class ObjectExtensions
                 continue;
             }
 
-            object? pv;
+            object pv;
 
             try
             {
@@ -74,22 +74,22 @@ internal static class ObjectExtensions
         return false;
     }
 
-    public static bool ContainsNonExplicitFormData(this object? value)
+    public static bool ContainsNonExplicitFormData(this object value)
     {
         return value.ContainsType<IFormFile>(includeTopLevel: true);
     }
 
-    public static bool ContainsStream(this object? value)
+    public static bool ContainsStream(this object value)
     {
         return value.ContainsType<Stream>(includeTopLevel: true);
     }
 
-    public static bool ContainsNestedStream(this object? value)
+    public static bool ContainsNestedStream(this object value)
     {
         return value.ContainsType<Stream>(includeTopLevel: false);
     }
 
-    public static bool ContainsByteArray(this object? value)
+    public static bool ContainsByteArray(this object value)
     {
         return value.ContainsType<byte[]>(includeTopLevel: true);
     }

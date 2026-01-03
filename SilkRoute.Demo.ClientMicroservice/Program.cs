@@ -21,7 +21,8 @@ builder.Services
     {
         options.InputFormatters.Insert(0, new BinaryBodyInputFormatter());
         options.ReturnHttpNotAcceptable = false;
-    });
+    })
+    .AddNewtonsoftJson();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

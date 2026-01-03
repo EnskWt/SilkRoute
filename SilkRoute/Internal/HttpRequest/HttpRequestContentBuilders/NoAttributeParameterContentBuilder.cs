@@ -45,7 +45,7 @@ internal sealed class NoAttributeParameterContentBuilder : IHttpRequestContentBu
         return httpRequestBuilder.NoAttributeParams.Count > 0;
     }
 
-    public HttpContent? Build(HttpRequestBuilder httpRequestBuilder)
+    public HttpContent Build(HttpRequestBuilder httpRequestBuilder)
     {
         if (httpRequestBuilder is null)
         {
@@ -79,6 +79,17 @@ internal sealed class NoAttributeParameterContentBuilder : IHttpRequestContentBu
         foreach (var p in items)
         {
             httpRequestBuilder.NoAttributeParams.Remove(p);
+        }
+        
+        foreach (var (name, value) in items)
+        {
+            if (value.ContainsStream() || value.ContainsByteArray())
+            {
+                throw new InvalidOperationException(
+                    $"Form parameter '{name}' of type '{value.GetType().Name}' cannot be sent as multipart field. " +
+                    "Use top-level [FromBody] Stream/byte[] for raw body, " +
+                    "or use multipart with top-level IFormFile / IEnumerable<IFormFile> / IFormFileCollection.");
+            }
         }
 
         var form = new MultipartFormDataContent();

@@ -5,6 +5,8 @@ namespace SilkRoute.Internal.HttpRequest.HttpRequestFormData.HttpRequestFormData
 
 internal sealed class SingleFileFormDataPartWriter : IHttpRequestFormDataPartWriter
 {
+    public int Priority => 0;
+
     public bool CanWritePart(object value)
     {
         if (value is null)
@@ -38,18 +40,15 @@ internal sealed class SingleFileFormDataPartWriter : IHttpRequestFormDataPartWri
 
         var file = (IFormFile)value;
 
-        using var ms = new MemoryStream();
-        file.CopyTo(ms);
-
-        var bytes = ms.ToArray();
-        var content = new ByteArrayContent(bytes);
+        var stream = file.OpenReadStream();
+        var content = new StreamContent(stream);
 
         var contentType = string.IsNullOrWhiteSpace(file.ContentType)
             ? "application/octet-stream"
             : file.ContentType;
 
         content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
-
+        
         form.Add(content, name, file.FileName);
     }
 }

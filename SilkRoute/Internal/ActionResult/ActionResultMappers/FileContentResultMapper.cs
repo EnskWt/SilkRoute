@@ -7,9 +7,9 @@ internal sealed class FileContentResultMapper : IActionResultMapper
 {
     public int Priority => 10;
 
-    public bool CanMap(object? payload) => payload is byte[];
+    public bool CanMap(object payload) => payload is byte[];
 
-    public object Map(HttpResponseMessage response, object? payload)
+    public object Map(HttpResponseMessage response, object payload)
     {
         var bytes = (byte[])payload!;
         var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";

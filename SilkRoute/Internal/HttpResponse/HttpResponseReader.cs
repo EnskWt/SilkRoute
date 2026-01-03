@@ -24,10 +24,10 @@ internal sealed class HttpResponseReader
             new ByteArrayContentReader(),
             new StringContentReader(),
             new JsonContentReader()
-        };
+        }.OrderBy(x => x.Priority).ToList();
     }
 
-    public async Task<object?> ReadResponseContent()
+    public async Task<object> ReadResponseContent()
     {
         foreach (var reader in _contentReaders)
         {
