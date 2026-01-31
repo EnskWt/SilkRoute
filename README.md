@@ -10,7 +10,7 @@ SilkRoute can be integrated into an existing solution or introduced as part of a
 
 ### Installation
 
-SilkRoute is distributed as a NuGet package and can be installed using any standard method (CLI, IDE UI, Package Manager Console). The package should be referenced in projects that define microservice API contracts, as well as in projects that will consume these contracts using SilkRoute’s proxy mechanism.
+SilkRoute is distributed as a NuGet package and can be installed using any standard method (CLI, IDE UI, Package Manager Console).
 
 ### Define a microservice contract interface
 
