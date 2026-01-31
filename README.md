@@ -15,6 +15,7 @@ SilkRoute is distributed as a NuGet package and can be installed using any stand
 ### Define a microservice contract interface
 
 A microservice API is described as a .NET interface that declares the available operations as methods. The interface must inherit from IMicroserviceClient. Each method should be annotated with ASP.NET Core attributes that describe the endpoint. This contract becomes the single source of truth for how outgoing requests should be composed.
+It is also recommended to reuse the same contract on the server side, for example by having the controller implement it. This keeps routes, parameters, and return types aligned and verified at compile time.
 
 ### Obtain a proxy implementation of the contract via SilkRoute
 
