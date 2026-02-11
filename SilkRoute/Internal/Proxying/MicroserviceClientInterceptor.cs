@@ -155,7 +155,7 @@ internal sealed class MicroserviceClientInterceptor : IAsyncInterceptor
             .ConfigureAwait(false);
     }
 
-    private static IActionReturnDescriptor GetActionReturnDescriptor(MethodInfo targetMethod)
+    private IActionReturnDescriptor GetActionReturnDescriptor(MethodInfo targetMethod)
     {
         var returnType = targetMethod.ReturnType;
 

@@ -25,9 +25,17 @@ There is also a planned alternative initialization path that would allow creatin
 
 Once an instance of the contract is available, its methods are invoked like regular service methods. Under the hood, SilkRoute builds the request according to the contract metadata, sends it through HttpClient, reads the response, and maps the result back to the declared return type.
 
-### Additional notes
+## Recommendation and additional notes
 
-If server-side endpoints accept raw binary bodies such as byte[] or Stream, the default ASP.NET Core configuration may not bind these payloads in the intended way. SilkRoute provides BinaryBodyInputFormatter for these scenarios. Registering this formatter on the server side enables safe and predictable binding of binary request bodies when an endpoint contract explicitly expects them.
+SilkRoute follows ASP.NET Core semantics for request/response handling. In most projects the default setup is enough, but the options below can improve predictability in specific scenarios.
+
+### Binary request bodies
+
+If server-side endpoints accept raw binary bodies (for example byte[] or Stream), the default ASP.NET Core configuration may not bind these payloads in the intended way. For such endpoints, SilkRoute provides BinaryBodyInputFormatter. Registering this formatter on the server side enables safe and predictable binding of binary request bodies when an endpoint contract explicitly expects them.
+
+### Serialization and deserialization consistency
+
+SilkRoute relies on Newtonsoft.Json internally. For the most consistent behavior and overall best experience in applications that use SilkRoute, consider using Newtonsoft.Json on the application side as well. This can be enabled in ASP.NET Core controllers via the `AddNewtonsoftJson` extension method.
 
 ## Examples and Troubleshooting Guidance
 
